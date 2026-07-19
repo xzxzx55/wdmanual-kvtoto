@@ -3,178 +3,295 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>⚡ PANEL WD INSTAN KVTOTO ⚡</title>
+    <title>Dashboard WD Manual</title>
     <style>
-        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; background-color: #0f172a; color: #e2e8f0; padding: 20px; }
-        .container { max-width: 1200px; margin: 0 auto; }
-        h1 { text-align: center; color: #38bdf8; margin-bottom: 30px; }
-        .grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
-        @media(min-width: 900px) { .grid { grid-template-columns: 1fr 2fr; } }
-        .card { background: #1e293b; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.5); border: 1px solid #334155; }
-        textarea { width: 100%; height: 200px; background: #0f172a; border: 1px solid #475569; border-radius: 6px; color: #fff; padding: 10px; box-sizing: border-box; font-size: 13px; }
-        button { background: #0284c7; color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; font-size: 15px; margin-top: 10px; transition: 0.2s; }
-        button:hover { background: #0369a1; }
-        .tabs { display: flex; gap: 10px; margin-bottom: 15px; overflow-x: auto; padding-bottom: 5px; }
-        .tab-btn { background: #334155; color: #94a3b8; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 500; font-size: 14px; white-space: nowrap; }
-        .tab-btn.active { background: #0284c7; color: white; }
-        .tab-btn.ewallet-tab { border: 1px solid #ef4444; }
-        .tab-btn.ewallet-tab.active { background: #ef4444; }
-        .table-container { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: left; }
-        th, td { padding: 10px; border-bottom: 1px solid #334155; }
-        th { background: #0f172a; color: #38bdf8; }
-        .btn-done { background: #22c55e; padding: 4px 8px; font-size: 11px; border-radius: 4px; margin: 0; width: auto; display: inline-block; }
-        .btn-done:hover { background: #16a34a; }
-        tr.row-done { background-color: rgba(34, 197, 94, 0.15) !important; color: #4ade80; }
-        tr.row-done .btn-done { display: none; }
-        .badge { background: #ef4444; color: white; padding: 2px 6px; border-radius: 10px; font-size: 11px; margin-left: 5px; }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #ffffff;
+            margin: 20px;
+            color: #000;
+        }
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+        }
+        /* Bagian Atas / Header Pilihan Bank */
+        .bank-filters {
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        .bank-filters a {
+            color: #0033cc;
+            text-decoration: none;
+            margin-right: 15px;
+            font-weight: bold;
+        }
+        .bank-filters .btn-uncheck {
+            background: #e1e1e1;
+            border: 1px solid #adadad;
+            padding: 2px 6px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-right: 10px;
+        }
+
+        /* Styling Tabel ala Excel / Dashboard */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        th {
+            background-color: #ffffff;
+            color: #0033cc;
+            text-align: left;
+            padding: 8px;
+            font-weight: normal;
+            border-bottom: 1px solid #ccc;
+        }
+        th.sortable {
+            text-decoration: underline;
+            cursor: pointer;
+        }
+        td {
+            padding: 8px;
+            border-bottom: 1px solid #e0e0e0;
+            vertical-align: top;
+        }
+        tr.row-even {
+            background-color: #f2f2f2;
+        }
+        tr.row-odd {
+            background-color: #ffffff;
+        }
+        tr.row-done {
+            background-color: #d4edda !important; /* Hijau ketika di-Accept/Done */
+        }
+        
+        /* Link & Teks Khusus */
+        .user-link {
+            color: #0033cc;
+            text-decoration: underline;
+            font-weight: bold;
+            display: block;
+        }
+        .sub-text {
+            color: #555;
+            font-size: 11px;
+            display: block;
+        }
+        .amount-text {
+            color: #cc0000;
+            font-weight: bold;
+        }
+        .currency-symbol {
+            background: #aaa;
+            color: #fff;
+            border-radius: 50%;
+            padding: 0 3px;
+            font-size: 10px;
+            margin-left: 5px;
+            display: inline-block;
+        }
+
+        /* Panel Tombol Aksi di Bawah Tabel */
+        .action-panel {
+            background-color: #dbdbdb;
+            padding: 10px;
+            text-align: center;
+            margin-top: -1px;
+            border: 1px solid #ccc;
+        }
+        .btn-action {
+            padding: 6px 24px;
+            font-size: 13px;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 0 5px;
+            font-weight: bold;
+        }
+        .btn-accept {
+            background-color: #4cae4c;
+        }
+        .btn-accept:hover {
+            background-color: #449d44;
+        }
+        .btn-reject {
+            background-color: #d9534f;
+        }
+        .btn-reject:hover {
+            background-color: #c9302c;
+        }
+
+        /* Kotak Input untuk Admin Pasang Data Mentah */
+        .admin-box {
+            margin-top: 30px;
+            padding: 15px;
+            border: 1px dashed #aaa;
+            background-color: #fafafa;
+        }
+        .admin-box textarea {
+            width: 100%;
+            height: 80px;
+            margin-top: 5px;
+        }
+        .btn-proses {
+            margin-top: 5px;
+            padding: 5px 15px;
+            background-color: #0033cc;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>⚡ PANEL WD INSTAN KVTOTO ⚡</h1>
-    
-    <div class="grid">
-        <!-- INPUT ADMIN -->
-        <div class="card">
-            <h3>📥 Input Data Mentah (Admin)</h3>
-            <p style="font-size: 12px; color: #94a3b8;">Paste data tabel dari web dashboard WD Anda di bawah ini:</p>
-            <textarea id="rawData" placeholder="Contoh: yaannn Withdraw 2026-07-19..."></textarea>
-            <button onclick="prosesData()">PROSES WD INSTAN</button>
-        </div>
-        
-        <!-- DISPLAY DATA WORKER -->
-        <div class="card">
-            <div class="tabs" id="tabsHeaders">
-                <div class="tab-btn active" onclick="switchTab('BCA')">BCA <span class="badge" id="b-BCA">0</span></div>
-                <div class="tab-btn" onclick="switchTab('BRIBNI')">BRI & BNI <span class="badge" id="b-BRIBNI">0</span></div>
-                <div class="tab-btn" onclick="switchTab('KECIL')">MANDIRI & KECIL <span class="badge" id="b-KECIL">0</span></div>
-                <div class="tab-btn ewallet-tab" onclick="switchTab('EWALLET')">E-WALLET <span class="badge" id="b-EWALLET">0</span></div>
-            </div>
-            
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th width="40">NO</th>
-                            <th>ID USER</th>
-                            <th>WAKTU</th>
-                            <th>NOMINAL</th>
-                            <th>REKENING TUJUAN</th>
-                            <th width="70">AKSI</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tableBody">
-                        <tr><td colspan="6" style="text-align:center; color:#64748b;">Belum ada data diinput.</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+    <!-- Menu Atas Bank -->
+    <div class="bank-filters">
+        <button class="btn-uncheck" onclick="toggleAllCheckboxes(false)">Un/check All</button>
+        <input type="checkbox" id="chk-bri" checked> <a href="#" onclick="filterBank('BRI')">BRI [<span id="count-bri">0</span>]</a>
+        <input type="checkbox" id="chk-dana" checked> <a href="#" onclick="filterBank('DANA')">DANA [<span id="count-dana">0</span>]</a>
+    </div>
+
+    <!-- Tabel Data -->
+    <table id="wd-table">
+        <thead>
+            <tr>
+                <th style="width: 40px;">No <input type="checkbox" id="select-all-rows" onclick="selectAllRows(this)"></th>
+                <th class="sortable">User</th>
+                <th class="sortable">Date</th>
+                <th class="sortable">Amount</th>
+                <th class="sortable">Balance</th>
+                <th>Bank Asal</th>
+            </tr>
+        </thead>
+        <tbody id="table-body">
+            <!-- Data Masuk Di Sini -->
+        </tbody>
+    </table>
+
+    <!-- Tombol Aksi di Bawah ala Dashboard -->
+    <div class="action-panel">
+        <button class="btn-action btn-accept" onclick="processSelected('DONE')">Accept</button>
+        <button class="btn-action btn-reject" onclick="processSelected('REJECT')">Reject</button>
+    </div>
+
+    <!-- Kotak Tersembunyi/Bawah untuk Anda input data mentah -->
+    <div class="admin-box">
+        <strong>Panel Input Data Mentah (Admin):</strong><br>
+        <textarea id="raw-input" placeholder="Paste data tabel dari web dashboard WD Anda di sini..."></textarea><br>
+        <button class="btn-proses" onclick="importRawData()">PROSES DATA</button>
     </div>
 </div>
 
 <script>
-let currentTab = 'BCA';
-let database = { BCA: [], BRIBNI: [], KECIL: [], EWALLET: [] };
+    let databaseWD = [];
 
-function prosesData() {
-    let rawText = document.getElementById("rawData").value.trim();
-    if (!rawText) return alert("Paste data dulu, Bos!");
+    function renderTable() {
+        const tbody = document.getElementById('table-body');
+        tbody.innerHTML = '';
+        
+        let briCount = 0;
+        let danaCount = 0;
 
-    database = { BCA: [], BRIBNI: [], KECIL: [], EWALLET: [] };
-    let lines = rawText.split("\n");
+        databaseWD.forEach((item, index) => {
+            // Hitung statistik di atas
+            if (item.bankName === 'BRI') briCount++;
+            if (item.bankName === 'DANA') danaCount++;
 
-    lines.forEach(line => {
-        if (!line.trim()) return;
-        let parts = line.split("\t");
-        if (parts.length < 4) parts = line.split(/\s{2,}/);
+            const rowClass = item.status === 'DONE' ? 'row-done' : (index % 2 === 0 ? 'row-even' : 'row-odd');
+            
+            const tr = document.createElement('tr');
+            tr.className = rowClass;
+            tr.innerHTML = `
+                <td>${index + 1} <input type="checkbox" class="row-check" data-id="${item.id}"></td>
+                <td>
+                    <a href="#" class="user-link">${item.username}</a>
+                    <span class="sub-text">Withdraw</span>
+                </td>
+                <td>${item.waktu}</td>
+                <td><span class="amount-text">${item.nominal}</span> <span class="currency-symbol">G</span></td>
+                <td>
+                    <span style="color:#0055aa; font-weight:bold;">${item.saldo}</span>
+                    <span class="sub-text" style="color:green; font-weight:bold;">G1</span>
+                </td>
+                <td>${item.rekeningTujuan}</td>
+            `;
+            tbody.appendChild(tr);
+        });
 
-        let id = "", tgl = "", nominal = "", rekText = "";
-        let rekIdx = parts.findIndex(p => p.includes(","));
-
-        if (rekIdx !== -1 && rekIdx >= 4) {
-            rekText = parts[rekIdx].trim();
-            nominal = parts[rekIdx - 2] ? parts[rekIdx - 2].trim() : "";
-            tgl = parts[rekIdx - 3] ? parts[rekIdx - 3].trim() : "";
-            id = parts[1] ? parts[1].replace("Withdraw", "").trim() : "";
-        } else {
-            for (let i = 0; i < parts.length; i++) {
-                if (parts[i].includes(",")) rekText = parts[i].trim();
-                if (parts[i].includes("-") && parts[i].includes(":")) tgl = parts[i].trim();
-            }
-            id = parts[1] ? parts[1].replace("Withdraw", "").trim() : "";
-            nominal = parts[4] ? parts[4].trim() : "";
-        }
-
-        if (!id || !rekText) return;
-
-        // Auto-fix typo EABANK -> SEABANK
-        let bank = rekText.split(",")[0].trim().toUpperCase();
-        if (bank === "EABANK") bank = "SEABANK";
-
-        let dataObj = { id, tgl, nominal, rek: rekText, isDone: false };
-
-        if (["DANA", "OVO", "GOPAY", "LINKAJA", "LINK AJA"].includes(bank)) {
-            database.EWALLET.push(dataObj);
-        } else if (bank === "BCA") {
-            database.BCA.push(dataObj);
-        } else if (bank === "BRI" || bank === "BNI") {
-            database.BRIBNI.push(dataObj);
-        } else {
-            database.KECIL.push(dataObj);
-        }
-    });
-
-    updateBadges();
-    renderData();
-    document.getElementById("rawData").value = ""; 
-}
-
-function renderData() {
-    let tbody = document.getElementById("tableBody");
-    tbody.innerHTML = "";
-    let items = database[currentTab];
-
-    if (items.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#64748b;">Tidak ada transaksi pending.</td></tr>`;
-        return;
+        document.getElementById('count-bri').innerText = briCount;
+        document.getElementById('count-dana').innerText = danaCount;
     }
 
-    items.forEach((item, index) => {
-        let tr = document.createElement("tr");
-        if (item.isDone) tr.className = "row-done";
+    function importRawData() {
+        const rawText = document.getElementById('raw-input').value.trim();
+        if(!rawText) return;
 
-        tr.innerHTML = `
-            <td>${index + 1}</td>
-            <td style="font-weight:bold; color:#f8fafc;">${item.id}</td>
-            <td style="color:#94a3b8;">${item.tgl}</td>
-            <td style="color:#38bdf8; font-weight:bold;">${item.nominal}</td>
-            <td>${item.rek}</td>
-            <td><button class="btn-done" onclick="markDone(${index})">DONE</button></td>
-        `;
-        tbody.appendChild(tr);
-    });
-}
+        const lines = rawText.split('\n');
+        
+        lines.forEach(line => {
+            const cols = line.split('\t');
+            if(cols.length >= 5) {
+                let username = cols[0] ? cols[0].replace('Withdraw', '').trim() : 'User';
+                let waktu = cols[1] || '';
+                let nominal = cols[2] || '0';
+                let saldo = cols[3] || '0';
+                let rekeningTujuan = cols[4] || '';
 
-function markDone(index) {
-    database[currentTab][index].isDone = true;
-    renderData();
-}
+                let bankName = "LAINNYA";
+                if(rekeningTujuan.toUpperCase().includes("BRI")) bankName = "BRI";
+                if(rekeningTujuan.toUpperCase().includes("DANA")) bankName = "DANA";
 
-function switchTab(tabName) {
-    currentTab = tabName;
-    document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
-    event.currentTarget.classList.add("active");
-    renderData();
-}
+                databaseWD.push({
+                    id: 'id_' + Math.random().toString(36).substr(2, 9),
+                    username: username,
+                    waktu: waktu,
+                    nominal: nominal,
+                    saldo: saldo,
+                    rekeningTujuan: rekeningTujuan,
+                    bankName: bankName,
+                    status: 'PENDING'
+                });
+            }
+        });
 
-function updateBadges() {
-    document.getElementById("b-BCA").innerText = database.BCA.filter(x => !x.isDone).length;
-    document.getElementById("b-BRIBNI").innerText = database.BRIBNI.filter(x => !x.isDone).length;
-    document.getElementById("b-KECIL").innerText = database.KECIL.filter(x => !x.isDone).length;
-    document.getElementById("b-EWALLET").innerText = database.EWALLET.filter(x => !x.isDone).length;
-}
+        document.getElementById('raw-input').value = '';
+        renderTable();
+    }
+
+    function processSelected(actionType) {
+        const checkboxes = document.querySelectorAll('.row-check:checked');
+        checkboxes.forEach(cb => {
+            const id = cb.getAttribute('data-id');
+            const dataItem = databaseWD.find(item => item.id === id);
+            if(dataItem) {
+                if(actionType === 'DONE') {
+                    dataItem.status = 'DONE'; // Ubah jadi hijau
+                } else {
+                    // Jika reject, hapus atau beri tanda khusus
+                    databaseWD = databaseWD.filter(item => item.id !== id);
+                }
+            }
+        });
+        document.getElementById('select-all-rows').checked = false;
+        renderTable();
+    }
+
+    function selectAllRows(master) {
+        const checkboxes = document.querySelectorAll('.row-check');
+        checkboxes.forEach(cb => cb.checked = master.checked);
+    }
+
+    function toggleAllCheckboxes(status) {
+        document.getElementById('chk-bri').checked = status;
+        document.getElementById('chk-dana').checked = status;
+    }
 </script>
+
 </body>
 </html>
