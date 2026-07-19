@@ -7,7 +7,6 @@
     <style>
         body { font-family: Arial, sans-serif; background-color: #ffffff; margin: 10px; font-size: 13px; color: #000; }
         
-        /* Layout Grid Atas Eksklusif Excel */
         .excel-header-grid { display: flex; width: 100%; border: 1px solid #ccc; margin-bottom: 5px; }
         .cell-seabank { flex: 3; background-color: #00ffff; color: #000; font-weight: bold; font-size: 22px; text-align: center; padding: 15px 0; border-right: 2px solid #000; letter-spacing: 2px; }
         .cell-proses-btn { flex: 1; background-color: #ff0000; color: #000; font-weight: bold; font-size: 16px; text-align: center; padding: 18px 0; cursor: pointer; border-right: 2px solid #000; border-bottom: 2px solid #000; text-transform: uppercase; }
@@ -15,37 +14,29 @@
         .cell-nominal-wd { flex: 1; background-color: #00ffff; font-weight: bold; font-size: 16px; text-align: center; padding: 18px 0; border-right: 1px solid #ccc; }
         .cell-nominal-tf { flex: 1; background-color: #00ff00; font-weight: bold; font-size: 14px; text-align: center; padding: 18px 0; }
 
-        /* Tab Bawah Excel Style */
         .excel-tabs { display: flex; background-color: #f3f3f3; border: 1px solid #ccc; border-bottom: none; }
         .excel-tab { padding: 8px 15px; cursor: pointer; border-right: 1px solid #ccc; background: #e4e4e4; font-weight: bold; color: #555; font-size: 12px; }
         .excel-tab.active { background: #fff; color: #0055ff; border-top: 3px solid #0055ff; margin-top: -3px; border-bottom: 1px solid #fff; }
 
-        /* Tabel Utama ala Kotak-Kotak Excel */
         .excel-table-container { border: 1px solid #ccc; overflow-x: auto; background: #fff; }
         table { width: 100%; border-collapse: collapse; }
         
-        /* Baris Judul Kolom (Kuning) */
         th { background-color: #ffff00; color: #000; font-weight: bold; border: 1px solid #000; text-align: center; padding: 6px; font-size: 13px; }
         
-        /* Baris Tanggal (Hijau) */
         .row-date-header td { background-color: #00ff00; color: #000; text-align: center; font-weight: bold; font-size: 11px; padding: 3px; border: 1px solid #000; letter-spacing: 2px; }
         
         td { border: 1px solid #ccc; padding: 6px; vertical-align: middle; height: 25px; }
         
-        /* Kolom Khusus Alignment */
         .col-center { text-align: center; }
-        .col-right { text-align: right; }
         
-        /* Pewarnaan Data Awal (Pink Lembut ala Excel Anda) */
         .row-data-wd { background-color: #fce4d6; }
-        .row-done { background-color: #d4edda !important; color: #155724; } /* Berubah hijau kalau DONE */
+        .row-done { background-color: #d4edda !important; color: #155724; }
         
         .user-link { color: #0033cc; text-decoration: underline; font-weight: bold; display: block; }
         .amount-text { color: #ff0000; font-weight: bold; }
         
-        /* Input Data Mentah Box */
         .input-area-box { margin-top: 20px; border: 1px dashed #777; padding: 10px; background: #fafafa; }
-        .input-area-box textarea { width: 100%; height: 60px; box-sizing: border-box; font-family: monospace; font-size: 12px; }
+        .input-area-box textarea { width: 100%; height: 100px; box-sizing: border-box; font-family: monospace; font-size: 12px; }
 
         .btn-done-trigger { background: #fff; border: 1px solid #aaa; padding: 2px 8px; cursor: pointer; font-size: 11px; font-weight: bold; border-radius: 3px; }
         .btn-done-trigger:hover { background: #e1e1e1; }
@@ -55,7 +46,7 @@
 
 <div style="max-width: 100%; margin: 0 auto;">
 
-    <!-- 1. BLOCK PANEL UTAMA ATAS (Eksklusif Excel Look) -->
+    <!-- BLOCK PANEL UTAMA ATAS -->
     <div class="excel-header-grid">
         <div class="cell-seabank">SEABANK</div>
         <div class="cell-proses-btn" onclick="prosesDataExcel()">PROSES DATA WD</div>
@@ -63,7 +54,7 @@
         <div class="cell-nominal-tf">Nominal WD<br>Nominal TF</div>
     </div>
 
-    <!-- 2. TAB MENU BAWAH EXCEL -->
+    <!-- TAB MENU BAWAH EXCEL -->
     <div class="excel-tabs">
         <div class="excel-tab active" id="tab-COPY" onclick="gantiTab('COPY')">BUAT COPY</div>
         <div class="excel-tab" id="tab-BCA" onclick="gantiTab('BCA')">BCA</div>
@@ -71,7 +62,7 @@
         <div class="excel-tab" id="tab-KECIL" onclick="gantiTab('KECIL')">MANDIRI & BANK KECIL</div>
     </div>
 
-    <!-- 3. TABEL KOTAK EXCEL -->
+    <!-- TABEL KOTAK EXCEL -->
     <div class="excel-table-container">
         <table>
             <thead>
@@ -88,7 +79,7 @@
                 </tr>
             </thead>
             <tbody id="excel-rows">
-                <!-- Baris kosong default ala excel -->
+                <!-- Baris kosong default -->
                 <script>
                     for(let i=1; i<=15; i++) {
                         document.write(`<tr><td class="col-center" style="color:#999;">${i}</td><td></td><td></td><td></td><td></td><td></td></tr>`);
@@ -98,7 +89,7 @@
         </table>
     </div>
 
-    <!-- 4. BOX ADMIN INPUT DATA MENTAH DARI WEB -->
+    <!-- BOX ADMIN INPUT DATA MENTAH -->
     <div class="input-area-box">
         <strong>Tempel / Paste Form Data Mentah Web Dashboard di Sini:</strong>
         <textarea id="raw-paste" placeholder="Paste data tabel WD di sini lalu klik tombol merah PROSES DATA WD di atas..."></textarea>
@@ -116,7 +107,6 @@
         
         let listData = dataMaster[currentActiveTab];
 
-        // Tampilkan data yang ada
         listData.forEach((item, index) => {
             const isDoneRow = item.keterangan.toUpperCase() === 'DONE';
             const rowClass = isDoneRow ? 'row-done' : (currentActiveTab === 'COPY' ? 'row-data-wd' : '');
@@ -124,7 +114,6 @@
             const tr = document.createElement('tr');
             tr.className = rowClass;
             
-            // Kolom Keterangan: Kalau di Tab Bank, tampilkan tombol "DONE" untuk worker klik
             let kolomKet = item.keterangan;
             if (currentActiveTab !== 'COPY' && !isDoneRow) {
                 kolomKet = `<button class="btn-done-trigger" onclick="setRowDone(${index})">DONE</button>`;
@@ -144,7 +133,6 @@
             tbody.appendChild(tr);
         });
 
-        // Tambahkan sisa baris kosong agar estetika grid Excel tetap terjaga
         let sisaBaris = 15 - listData.length;
         for (let i = 0; i < sisaBaris; i++) {
             const tr = document.createElement('tr');
@@ -157,53 +145,47 @@
         const rawText = document.getElementById('raw-paste').value.trim();
         if (!rawText) return alert("Tempel data form-nya dulu di kotak bawah, Bos!");
 
-        const lines = rawText.split('\n');
+        // Deteksi pemisah baris baru dan satukan baris data yang renggang
+        const lines = rawText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
         
-        lines.forEach(line => {
-            if (!line.trim()) return;
-            let parts = line.split('\t');
-            if (parts.length < 4) parts = line.split(/\s{2,}/);
+        let i = 0;
+        while (i < lines.length) {
+            // Cek jika baris saat ini diawali nomor urut (seperti data di gambar Bos)
+            if (/^\d+$/.test(lines[i])) {
+                let idUser = lines[i+1] ? lines[i+1].replace("Withdraw", "").trim() : "";
+                let tgl = lines[i+2] || "";
+                
+                // Cari data nominal dan G1 di baris berikutnya
+                let infoNominal = lines[i+3] || ""; 
+                let nominal = infoNominal.split(/\s+/)[0] || ""; 
+                
+                let namaRekening = lines[i+4] || "";
+                
+                if (idUser && namaRekening) {
+                    let bank = namaRekening.split(",")[0].trim().toUpperCase();
+                    if (bank === "EABANK") bank = "SEABANK";
 
-            let idUser = "", tgl = "", nominal = "", namaRekening = "";
-            let rekIdx = parts.findIndex(p => p.includes(","));
+                    let itemObj = { idUser, tgl, nominal, namaRekening, keterangan: "" };
 
-            if (rekIdx !== -1 && rekIdx >= 4) {
-                namaRekening = parts[rekIdx].trim();
-                nominal = parts[rekIdx - 2] ? parts[rekIdx - 2].trim() : "";
-                tgl = parts[rekIdx - 3] ? parts[rekIdx - 3].trim() : "";
-                idUser = parts[1] ? parts[1].replace("Withdraw", "").trim() : "";
-            } else {
-                for (let i = 0; i < parts.length; i++) {
-                    if (parts[i].includes(",")) namaRekening = parts[i].trim();
-                    if (parts[i].includes("-") && parts[i].includes(":")) tgl = parts[i].trim();
+                    // Sortir otomatis ke tab masing-masing
+                    if (["DANA", "OVO", "GOPAY", "LINKAJA"].includes(bank)) {
+                        dataMaster.COPY.push(itemObj);
+                    } else if (bank === "BCA") {
+                        dataMaster.BCA.push(itemObj);
+                    } else if (bank === "BRI" || bank === "BNI") {
+                        dataMaster.BRIBNI.push(itemObj);
+                    } else {
+                        dataMaster.KECIL.push(itemObj);
+                    }
                 }
-                idUser = parts[1] ? parts[1].replace("Withdraw", "").trim() : "";
-                nominal = parts[4] ? parts[4].trim() : "";
-            }
-
-            if (!idUser || !namaRekening) return;
-
-            // Auto-fix typo bank
-            let bank = namaRekening.split(",")[0].trim().toUpperCase();
-            if (bank === "EABANK") bank = "SEABANK";
-
-            let itemObj = { idUser, tgl, nominal, namaRekening, keterangan: "" };
-
-            // Pilah otomatis masuk ke list bank masing-masing di memori
-            if (["DANA", "OVO", "GOPAY", "LINKAJA"].includes(bank)) {
-                dataMaster.COPY.push(itemObj); // E-Wallet tetap di BUAT COPY sesuai sistem lama
-            } else if (bank === "BCA") {
-                dataMaster.BCA.push(itemObj);
-            } else if (bank === "BRI" || bank === "BNI") {
-                dataMaster.BRIBNI.push(itemObj);
+                i += 5; // Loncat ke blok data berikutnya
             } else {
-                dataMaster.KECIL.push(itemObj);
+                i++;
             }
-        });
+        }
 
         document.getElementById('raw-paste').value = '';
         renderExcelTable();
-        alert("Data berhasil dipilah ke masing-masing Form Bank, Bos!");
     }
 
     function setRowDone(index) {
