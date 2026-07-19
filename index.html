@@ -7,51 +7,79 @@
     <style>
         body { font-family: Arial, sans-serif; background-color: #ffffff; margin: 10px; font-size: 13px; color: #000; }
         
-        .excel-header-grid { display: flex; width: 100%; border: 1px solid #ccc; margin-bottom: 5px; }
-        .cell-seabank { flex: 3; background-color: #00ffff; color: #000; font-weight: bold; font-size: 22px; text-align: center; padding: 15px 0; border-right: 2px solid #000; letter-spacing: 2px; }
-        .cell-proses-btn { flex: 1; background-color: #ff0000; color: #000; font-weight: bold; font-size: 16px; text-align: center; padding: 18px 0; cursor: pointer; border-right: 2px solid #000; border-bottom: 2px solid #000; text-transform: uppercase; }
+        /* Header Blok Atas Excel */
+        .excel-header-grid { display: flex; width: 100%; border: 1px solid #00cccb; margin-bottom: 5px; }
+        .cell-seabank { flex: 3.5; background-color: #00ffff; color: #000; font-weight: bold; font-size: 22px; padding: 10px 0; border-right: 1px solid #000; letter-spacing: 2px; display: flex; align-items: center; justify-content: center; }
+        .header-wrap { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; max-width: 1200px; }
+        .header-title { flex: 1; text-align: center; font-size: 22px; letter-spacing: 2px; margin: 0 10px; }
+        .header-gif { width: 120px; max-width: 20%; height: auto; object-fit: contain; }
+        .cell-proses-btn { flex: 1; background-color: #ff0000; color: #000; font-weight: bold; font-size: 14px; text-align: center; padding: 20px 0; cursor: pointer; border-right: 1px solid #000; text-transform: uppercase; border-bottom: 2px solid #000; }
         .cell-proses-btn:hover { background-color: #cc0000; }
-        .cell-nominal-wd { flex: 1; background-color: #00ffff; font-weight: bold; font-size: 16px; text-align: center; padding: 18px 0; border-right: 1px solid #ccc; }
-        .cell-nominal-tf { flex: 1; background-color: #00ff00; font-weight: bold; font-size: 14px; text-align: center; padding: 18px 0; }
+        .cell-nominal-wd { flex: 0.8; background-color: #c0c0c0; font-weight: bold; font-size: 16px; text-align: center; padding: 20px 0; border-right: 1px solid #000; }
+        .cell-nominal-tf { flex: 0.8; background-color: #c0c0c0; font-weight: bold; font-size: 16px; text-align: center; padding: 20px 0; border-right: 1px solid #000; }
+        .cell-label-side { flex: 1.5; background-color: #00ffff; font-weight: bold; font-size: 14px; text-align: center; padding: 12px 0; line-height: 1.4; }
+        .select-checkbox { width: 18px; height: 18px; cursor: pointer; }
 
+        /* Tab Bawah Excel Style */
         .excel-tabs { display: flex; background-color: #f3f3f3; border: 1px solid #ccc; border-bottom: none; }
         .excel-tab { padding: 8px 15px; cursor: pointer; border-right: 1px solid #ccc; background: #e4e4e4; font-weight: bold; color: #555; font-size: 12px; }
         .excel-tab.active { background: #fff; color: #0055ff; border-top: 3px solid #0055ff; margin-top: -3px; border-bottom: 1px solid #fff; }
 
+        /* Tabel Utama */
         .excel-table-container { border: 1px solid #ccc; overflow-x: auto; background: #fff; }
-        table { width: 100%; border-collapse: collapse; }
+        .main-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 12px; align-items: start; }
+        .copy-output-panel { display: flex; flex-direction: column; gap: 10px; }
+        .copy-output-box { border: 1px solid #ccc; background: #fafafa; padding: 10px; }
+        .copy-output-box strong { display: block; margin-bottom: 6px; font-size: 13px; }
+        .copy-output-box textarea { width: 100%; height: 116px; box-sizing: border-box; resize: vertical; font-family: monospace; font-size: 12px; }
+        
+        table { width: 100%; border-collapse: collapse; table-layout: fixed; }
         
         th { background-color: #ffff00; color: #000; font-weight: bold; border: 1px solid #000; text-align: center; padding: 6px; font-size: 13px; }
         
-        .row-date-header td { background-color: #00ff00; color: #000; text-align: center; font-weight: bold; font-size: 11px; padding: 3px; border: 1px solid #000; letter-spacing: 2px; }
+        .row-date-header td { background-color: #00ff00; color: #000; text-align: center; font-weight: bold; font-size: 11px; padding: 4px; border: 1px solid #000; letter-spacing: 2px; }
         
-        td { border: 1px solid #ccc; padding: 6px; vertical-align: middle; height: 25px; }
+        td { border: 1px solid #000; padding: 6px; vertical-align: middle; height: 30px; word-wrap: break-word; }
         
         .col-center { text-align: center; }
         
-        .row-data-wd { background-color: #fce4d6; }
+        /* Baris data awal (tanpa background/putih bersih seperti gambar baru) */
+        .row-data-wd { background-color: #ffffff; }
         .row-done { background-color: #d4edda !important; color: #155724; }
         
-        .user-link { color: #0033cc; text-decoration: underline; font-weight: bold; display: block; }
-        .amount-text { color: #ff0000; font-weight: bold; }
+        .user-link { color: #000000; text-decoration: underline; font-weight: bold; display: block; }
+        .amount-text { color: #000000; font-weight: normal; }
         
+        /* Input Area Box Modifikasi */
         .input-area-box { margin-top: 20px; border: 1px dashed #777; padding: 10px; background: #fafafa; }
-        .input-area-box textarea { width: 100%; height: 100px; box-sizing: border-box; font-family: monospace; font-size: 12px; }
+        .input-area-box textarea { width: 100%; height: 120px; box-sizing: border-box; font-family: monospace; font-size: 12px; }
 
-        .btn-done-trigger { background: #fff; border: 1px solid #aaa; padding: 2px 8px; cursor: pointer; font-size: 11px; font-weight: bold; border-radius: 3px; }
+        .btn-done-trigger, .btn-reject-trigger { background: #fff; border: 1px solid #aaa; padding: 2px 8px; cursor: pointer; font-size: 11px; font-weight: bold; border-radius: 3px; margin: 0 2px; }
         .btn-done-trigger:hover { background: #e1e1e1; }
+        .btn-reject-trigger { border-color: #d9534f; color: #d9534f; }
+        .btn-reject-trigger:hover { background: #f8d7da; }
     </style>
 </head>
 <body>
 
 <div style="max-width: 100%; margin: 0 auto;">
 
-    <!-- BLOCK PANEL UTAMA ATAS -->
+    <!-- BLOCK PANEL UTAMA ATAS EKSKLUSIF EXCEL -->
     <div class="excel-header-grid">
-        <div class="cell-seabank">SEABANK</div>
-        <div class="cell-proses-btn" onclick="prosesDataExcel()">PROSES DATA WD</div>
-        <div class="cell-nominal-wd">-2,500</div>
-        <div class="cell-nominal-tf">Nominal WD<br>Nominal TF</div>
+        <div class="cell-seabank">
+            <div class="header-wrap">
+                <img class="header-gif" src="https://photoin.io/images/2026/04/26/Logo-KVTOTO-Gif.gif" alt="KVTOTO kiri" />
+                <div class="header-title">WD MANUAL KVTOTO MANTAP!</div>
+                <img class="header-gif" src="https://photoin.io/images/2026/04/26/Logo-KVTOTO-Gif.gif" alt="KVTOTO kanan" />
+            </div>
+        </div>
+    </div>
+    <div style="margin-top:8px; display:flex; gap:8px; flex-wrap: wrap; align-items: center;">
+        <button onclick="resetAllData()" style="padding:8px 12px; border:none; background:#d9534f; color:#fff; cursor:pointer; border-radius:4px;">HAPUS MANUAL SEMUA</button>
+        <button onclick="deleteDoneTransferRows()" style="padding:8px 12px; border:none; background:#f0ad4e; color:#000; cursor:pointer; border-radius:4px;">HAPUS DONE TRANSFER TAB INI</button>
+        <button onclick="deleteSelectedRows()" style="padding:8px 12px; border:none; background:#d9534f; color:#fff; cursor:pointer; border-radius:4px;">HAPUS CENTANG TERPILIH</button>
+        <button onclick="markSelectedDone()" style="padding:8px 12px; border:none; background:#5cb85c; color:#fff; cursor:pointer; border-radius:4px;">DONE TERPILIH</button>
+        <span style="align-self:center; font-size:12px; color:#333;">Data disimpan otomatis. Refresh tidak menghapus.</span>
     </div>
 
     <!-- TAB MENU BAWAH EXCEL -->
@@ -62,37 +90,69 @@
         <div class="excel-tab" id="tab-KECIL" onclick="gantiTab('KECIL')">MANDIRI & BANK KECIL</div>
     </div>
 
-    <!-- TABEL KOTAK EXCEL -->
-    <div class="excel-table-container">
-        <table>
-            <thead>
-                <tr>
-                    <th style="width: 50px;">NO</th>
-                    <th style="width: 120px;">ID</th>
-                    <th style="width: 160px;">TGL</th>
-                    <th style="width: 120px;">NOMINAL</th>
-                    <th>NAMA REKENING</th>
-                    <th style="width: 120px;">KETERANGAN</th>
-                </tr>
-                <tr class="row-date-header">
-                    <td colspan="6">TANGGAL</td>
-                </tr>
-            </thead>
-            <tbody id="excel-rows">
-                <!-- Baris kosong default -->
-                <script>
-                    for(let i=1; i<=15; i++) {
-                        document.write(`<tr><td class="col-center" style="color:#999;">${i}</td><td></td><td></td><td></td><td></td><td></td></tr>`);
-                    }
-                </script>
-            </tbody>
-        </table>
+    <!-- TABEL UTAMA SANGAT RAPI -->
+    <div class="main-grid">
+        <div class="excel-table-container">
+            <table>
+                <colgroup>
+                    <col style="width: 40px;">
+                    <col style="width: 50px;">
+                    <col style="width: 130px;">
+                    <col style="width: 180px;">
+                    <col style="width: 110px;">
+                    <col>
+                    <col style="width: 130px;">
+                    <col style="width: 120px;">
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th>OK</th>
+                        <th>NO</th>
+                        <th>ID</th>
+                        <th>TGL</th>
+                        <th style="color: red;">NOMINAL</th>
+                        <th>NAMA REKENING</th>
+                        <th>KETERANGAN</th>
+                        <th>ACTION</th>
+                    </tr>
+                    <tr class="row-date-header">
+                        <td colspan="7">TANGGAL</td>
+                    </tr>
+                </thead>
+                <tbody id="excel-rows">
+                    <!-- Baris kosong default -->
+                    <script>
+                        for(let i=1; i<=15; i++) {
+                            document.write(`<tr><td class="col-center" style="color:#999;">${i}</td><td></td><td></td><td></td><td></td><td></td></tr>`);
+                        }
+                    </script>
+                </tbody>
+            </table>
+        </div>
+        <div class="copy-output-panel">
+            <div class="copy-output-box">
+                <strong>Copy ID</strong>
+                <textarea id="copy-id" readonly placeholder="ID akan tampil di sini..."></textarea>
+            </div>
+            <div class="copy-output-box">
+                <strong>Copy Nominal</strong>
+                <textarea id="copy-nominal" readonly placeholder="Nominal akan tampil di sini..."></textarea>
+            </div>
+            <div class="copy-output-box">
+                <strong>Copy Nama Rekening</strong>
+                <textarea id="copy-nama" readonly placeholder="Nama Rekening akan tampil di sini..."></textarea>
+            </div>
+        </div>
     </div>
 
-    <!-- BOX ADMIN INPUT DATA MENTAH -->
+    <!-- BOX INPUT UTAMA -->
     <div class="input-area-box">
-        <strong>Tempel / Paste Form Data Mentah Web Dashboard di Sini:</strong>
-        <textarea id="raw-paste" placeholder="Paste data tabel WD di sini lalu klik tombol merah PROSES DATA WD di atas..."></textarea>
+        <strong>Tempel / Paste Seluruh Data Tabel Excel Anda di Sini:</strong>
+        <textarea id="raw-paste" placeholder="Salin baris tabel dari Excel Anda (termasuk kolom ID, TGL, NOMINAL, REKENING) lalu paste di sini..."></textarea>
+        <div style="margin-top:10px; display:flex; gap:10px; align-items:center;">
+            <button id="proses-btn" onclick="prosesDataExcel()" style="padding:10px 14px; border:none; background:#ff0000; color:#fff; font-weight:bold; cursor:pointer; border-radius:4px;">PROSES DATA WD</button>
+            <span style="font-size:12px; color:#333;">Tekan tab lalu enter pada tombol untuk cepat.</span>
+        </div>
     </div>
 
 </div>
@@ -101,6 +161,25 @@
     let currentActiveTab = 'COPY';
     let dataMaster = { COPY: [], BCA: [], BRIBNI: [], KECIL: [] };
 
+    function saveDataState() {
+        const state = { currentActiveTab, dataMaster };
+        localStorage.setItem('wdToolData', JSON.stringify(state));
+    }
+
+    function loadDataState() {
+        const state = localStorage.getItem('wdToolData');
+        if (!state) return;
+        try {
+            const parsed = JSON.parse(state);
+            if (parsed && typeof parsed === 'object') {
+                currentActiveTab = parsed.currentActiveTab || currentActiveTab;
+                dataMaster = parsed.dataMaster || dataMaster;
+            }
+        } catch (e) {
+            console.warn('Gagal memuat data tersimpan:', e);
+        }
+    }
+
     function renderExcelTable() {
         const tbody = document.getElementById('excel-rows');
         tbody.innerHTML = '';
@@ -108,89 +187,256 @@
         let listData = dataMaster[currentActiveTab];
 
         listData.forEach((item, index) => {
-            const isDoneRow = item.keterangan.toUpperCase() === 'DONE';
-            const rowClass = isDoneRow ? 'row-done' : (currentActiveTab === 'COPY' ? 'row-data-wd' : '');
+            const isDoneRow = item.keterangan.toUpperCase() === 'DONE TRANSFER';
+            const rowClass = isDoneRow ? 'row-done' : 'row-data-wd';
             
             const tr = document.createElement('tr');
             tr.className = rowClass;
             
-            let kolomKet = item.keterangan;
-            if (currentActiveTab !== 'COPY' && !isDoneRow) {
-                kolomKet = `<button class="btn-done-trigger" onclick="setRowDone(${index})">DONE</button>`;
-            }
+            const kolomKet = isDoneRow ? item.keterangan : `<button class="btn-done-trigger" onclick="setRowDone(${index})">DONE TRANSFER</button>`;
+            const rejectButton = `<button class="btn-reject-trigger" onclick="removeRow(${index})">REJECT</button>`;
 
             tr.innerHTML = `
-                <td class="col-center">${index + 1}</td>
+                <td class="col-center"><input type="checkbox" class="select-checkbox" ${item.selected ? 'checked' : ''} onclick="toggleRowSelection(${index}, this.checked)" /></td>
+                <td class="col-center" style="font-weight:bold;">${index + 1}</td>
                 <td class="col-center">
                     <span class="user-link">${item.idUser}</span>
                     <span style="color:#0033cc; font-size:11px; text-decoration:underline;">Withdraw</span>
                 </td>
                 <td class="col-center">${item.tgl}</td>
-                <td class="col-center amount-text">${item.nominal}</td>
-                <td>${item.namaRekening}</td>
+                <td class="col-center amount-text" style="font-weight:bold;">${item.nominal}</td>
+                <td style="padding-left:15px;">${item.namaRekening}</td>
                 <td class="col-center">${kolomKet}</td>
+                <td class="col-center">${rejectButton}</td>
             `;
             tbody.appendChild(tr);
         });
 
+        // Sisa baris kosong pembantu estetika spreadsheet
         let sisaBaris = 15 - listData.length;
         for (let i = 0; i < sisaBaris; i++) {
             const tr = document.createElement('tr');
-            tr.innerHTML = `<td class="col-center" style="color:#999;">${listData.length + i + 1}</td><td></td><td></td><td></td><td></td><td></td>`;
+            tr.innerHTML = `<td></td><td class="col-center" style="color:#999;">${listData.length + i + 1}</td><td></td><td></td><td></td><td></td><td></td><td></td>`;
             tbody.appendChild(tr);
         }
+
+        updateCopyColumns();
+    }
+
+    function sanitizeNominal(value) {
+        if (!value) return '';
+        return value.replace(/,/g, '').replace(/\(|\)/g, '').trim();
+    }
+
+    function formatCopyNominal(value) {
+        const cleaned = sanitizeNominal(value);
+        if (!cleaned) return '';
+        return cleaned.startsWith('-') ? cleaned : '-' + cleaned;
+    }
+
+    function extractOwnerName(value) {
+        if (!value) return '';
+        const parts = value.split(',').map(p => p.trim()).filter(Boolean);
+        if (parts.length > 1) {
+            return parts[parts.length - 1];
+        }
+        return value.trim();
+    }
+
+    function normalizeId(value) {
+        return value ? value.replace(/"/g, '').trim() : '';
+    }
+
+    function updateCopyColumns() {
+        const listData = dataMaster[currentActiveTab].filter(item => item.keterangan.toUpperCase() === 'DONE TRANSFER');
+        document.getElementById('copy-id').value = listData.map(item => normalizeId(item.idUser)).join('\n');
+        document.getElementById('copy-nominal').value = listData.map(item => formatCopyNominal(item.nominal)).join('\n');
+        document.getElementById('copy-nama').value = listData.map(item => extractOwnerName(item.namaRekening)).join('\n');
+    }
+
+    function normalizeLine(text) {
+        return text.replace(/\r/g, '').trim();
+    }
+
+    function normalizePasteText(rawText) {
+        const lines = rawText.split('\n').map(l => l.trim()).filter(l => l !== '');
+        const rows = [];
+        let current = '';
+
+        for (const line of lines) {
+            if (/^\d+\b/.test(line)) {
+                if (current) rows.push(current);
+                current = line;
+            } else if (current) {
+                current += ' ' + line;
+            }
+        }
+
+        if (current) rows.push(current);
+        return rows;
+    }
+
+    function parsePasteLine(line) {
+        const headerPattern = /\bNO\b|\bID\b|\bTGL\b|\bNOMINAL\b|\bNAMA REKENING\b/i;
+        if (headerPattern.test(line)) return null;
+
+        const rowText = line.replace(/\bWithdraw\b/gi, '').replace(/\t+/g, '\t').trim();
+        const fields = rowText.split('\t').map(f => f.trim()).filter(f => f !== '');
+
+        if (fields.length >= 5) {
+            const idUser = fields[1];
+            const tgl = fields[2];
+            const nominal = sanitizeNominal(fields[3]);
+            const namaRekening = fields.slice(4).join(' ');
+            return { idUser, tgl, nominal, namaRekening, selected: false };
+        }
+
+        const regex = /^\d+\s+([^\s]+)\s+(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2})\s+([\d\.,]+)\s+(.+)$/;
+        const match = rowText.match(regex);
+        if (match) {
+            return {
+                idUser: match[1],
+                tgl: match[2],
+                nominal: match[3],
+                namaRekening: match[4],
+                selected: false
+            };
+        }
+
+        return null;
+    }
+
+    function detectBank(rawText) {
+        const text = rawText.toUpperCase();
+        if (text.includes('DANA')) return 'DANA';
+        if (text.includes('OVO')) return 'OVO';
+        if (text.includes('GOPAY')) return 'GOPAY';
+        if (text.includes('LINKAJA')) return 'LINKAJA';
+        if (text.includes('BCA')) return 'BCA';
+        if (text.includes('BRI')) return 'BRI';
+        if (text.includes('BNI')) return 'BNI';
+        if (text.includes('MANDIRI')) return 'MANDIRI';
+
+        // Bank kecil list
+        if (text.includes('DANAMON')) return 'KECIL';
+        if (text.includes('CIMB')) return 'KECIL';
+        if (text.includes('PERMATA')) return 'KECIL';
+        if (text.includes('PANIN')) return 'KECIL';
+        if (text.includes('MAYBANK')) return 'KECIL';
+        if (text.includes('OCBC') || text.includes('NISP')) return 'KECIL';
+        if (text.includes('MEGA')) return 'KECIL';
+        if (text.includes('BTN')) return 'KECIL';
+        if (text.includes('SINARMAS')) return 'KECIL';
+        if (text.includes('KB') || text.includes('BUKOPIN')) return 'KECIL';
+        if (text.includes('ARTHA')) return 'KECIL';
+        if (text.includes('BUMI')) return 'KECIL';
+        if (text.includes('MASPION')) return 'KECIL';
+        if (text.includes('MESTIKA')) return 'KECIL';
+        if (text.includes('GANESHA')) return 'KECIL';
+        if (text.includes('INA PERDANA') || text.includes('INA')) return 'KECIL';
+        if (text.includes('VICTORIA')) return 'KECIL';
+        if (text.includes('JAGO')) return 'KECIL';
+        if (text.includes('ALLO')) return 'KECIL';
+        if (text.includes('NEO') || text.includes('BNC')) return 'KECIL';
+        if (text.includes('BLU')) return 'KECIL';
+        if (text.includes('SEABANK')) return 'KECIL';
+        if (text.includes('KROM')) return 'KECIL';
+        if (text.includes('SUPERBANK')) return 'KECIL';
+        if (text.includes('BJB')) return 'KECIL';
+        if (text.includes('DKI')) return 'KECIL';
+        if (text.includes('JATIM')) return 'KECIL';
+        if (text.includes('JATENG')) return 'KECIL';
+        if (text.includes('SUMUT')) return 'KECIL';
+        if (text.includes('SULSELBAR')) return 'KECIL';
+        if (text.includes('BPD')) return 'KECIL';
+        return '';
+    }
+
+    function isDuplicateItem(item) {
+        const allItems = [...dataMaster.COPY, ...dataMaster.BCA, ...dataMaster.BRIBNI, ...dataMaster.KECIL];
+        return allItems.some(existing =>
+            existing.idUser === item.idUser &&
+            existing.tgl === item.tgl &&
+            existing.nominal === item.nominal &&
+            existing.namaRekening === item.namaRekening
+        );
+    }
+
+    function getTabForBank(bankKey) {
+        if (["DANA", "OVO", "GOPAY", "LINKAJA"].includes(bankKey)) return 'COPY';
+        if (bankKey === 'BCA') return 'BCA';
+        if (bankKey === 'BRI' || bankKey === 'BNI') return 'BRIBNI';
+        return 'KECIL';
+    }
+
+    function updateTabLabels() {
+        document.getElementById('tab-COPY').textContent = `EWALLET (${dataMaster.COPY.length})`;
+        document.getElementById('tab-BCA').textContent = `BCA (${dataMaster.BCA.length})`;
+        document.getElementById('tab-BRIBNI').textContent = `BRI & BNI (${dataMaster.BRIBNI.length})`;
+        document.getElementById('tab-KECIL').textContent = `MANDIRI & BANK KECIL (${dataMaster.KECIL.length})`;
     }
 
     function prosesDataExcel() {
         const rawText = document.getElementById('raw-paste').value.trim();
-        if (!rawText) return alert("Tempel data form-nya dulu di kotak bawah, Bos!");
+        if (!rawText) return alert("Tempel datanya dulu di kotak bawah, Bos!");
 
-        // Deteksi pemisah baris baru dan satukan baris data yang renggang
-        const lines = rawText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
-        
-        let i = 0;
-        while (i < lines.length) {
-            // Cek jika baris saat ini diawali nomor urut (seperti data di gambar Bos)
-            if (/^\d+$/.test(lines[i])) {
-                let idUser = lines[i+1] ? lines[i+1].replace("Withdraw", "").trim() : "";
-                let tgl = lines[i+2] || "";
-                
-                // Cari data nominal dan G1 di baris berikutnya
-                let infoNominal = lines[i+3] || ""; 
-                let nominal = infoNominal.split(/\s+/)[0] || ""; 
-                
-                let namaRekening = lines[i+4] || "";
-                
-                if (idUser && namaRekening) {
-                    let bank = namaRekening.split(",")[0].trim().toUpperCase();
-                    if (bank === "EABANK") bank = "SEABANK";
+        const cleanedText = normalizeLine(rawText);
+        const rows = normalizePasteText(cleanedText);
 
-                    let itemObj = { idUser, tgl, nominal, namaRekening, keterangan: "" };
+        rows.forEach(row => {
+            const item = parsePasteLine(row);
+            if (!item || !item.idUser || !item.namaRekening) return;
 
-                    // Sortir otomatis ke tab masing-masing
-                    if (["DANA", "OVO", "GOPAY", "LINKAJA"].includes(bank)) {
-                        dataMaster.COPY.push(itemObj);
-                    } else if (bank === "BCA") {
-                        dataMaster.BCA.push(itemObj);
-                    } else if (bank === "BRI" || bank === "BNI") {
-                        dataMaster.BRIBNI.push(itemObj);
-                    } else {
-                        dataMaster.KECIL.push(itemObj);
-                    }
-                }
-                i += 5; // Loncat ke blok data berikutnya
-            } else {
-                i++;
-            }
-        }
+            if (isDuplicateItem(item)) return;
+
+            const bankKey = detectBank(item.namaRekening);
+            const targetTab = getTabForBank(bankKey);
+            dataMaster[targetTab].push({ ...item, keterangan: '' });
+        });
 
         document.getElementById('raw-paste').value = '';
+        saveDataState();
         renderExcelTable();
+        updateTabLabels();
     }
 
     function setRowDone(index) {
-        dataMaster[currentActiveTab][index].keterangan = 'DONE';
+        dataMaster[currentActiveTab][index].keterangan = 'DONE TRANSFER';
+        saveDataState();
         renderExcelTable();
+    }
+
+    function toggleRowSelection(index, isSelected) {
+        dataMaster[currentActiveTab][index].selected = isSelected;
+        saveDataState();
+    }
+
+    function deleteSelectedRows() {
+        const tab = currentActiveTab;
+        const selectedCount = dataMaster[tab].filter(item => item.selected).length;
+        if (selectedCount === 0) return alert('Tidak ada baris yang dicentang untuk dihapus.');
+        if (!confirm(`Hapus ${selectedCount} baris terpilih di tab ${tab}?`)) return;
+        dataMaster[tab] = dataMaster[tab].filter(item => !item.selected);
+        saveDataState();
+        renderExcelTable();
+        updateTabLabels();
+    }
+
+    function markSelectedDone() {
+        const tab = currentActiveTab;
+        const selectedItems = dataMaster[tab].filter(item => item.selected && item.keterangan.toUpperCase() !== 'DONE TRANSFER');
+        if (selectedItems.length === 0) return alert('Tidak ada baris yang dicentang untuk ditandai DONE.');
+        selectedItems.forEach(item => item.keterangan = 'DONE TRANSFER');
+        saveDataState();
+        renderExcelTable();
+    }
+
+    function removeRow(index) {
+        if (!confirm('Hapus baris ini dari data?')) return;
+        dataMaster[currentActiveTab].splice(index, 1);
+        saveDataState();
+        renderExcelTable();
+        updateTabLabels();
     }
 
     function gantiTab(tabName) {
@@ -198,7 +444,42 @@
         document.querySelectorAll('.excel-tab').forEach(t => t.classList.remove('active'));
         document.getElementById('tab-' + tabName).classList.add('active');
         renderExcelTable();
+        updateCopyColumns();
+        saveDataState();
     }
+
+    function deleteDoneTransferRows() {
+        const tab = currentActiveTab;
+        const beforeCount = dataMaster[tab].length;
+        dataMaster[tab] = dataMaster[tab].filter(item => item.keterangan.toUpperCase() !== 'DONE TRANSFER');
+        const afterCount = dataMaster[tab].length;
+        if (beforeCount === afterCount) {
+            alert('Tidak ada baris DONE TRANSFER di tab saat ini untuk dihapus.');
+            return;
+        }
+        saveDataState();
+        renderExcelTable();
+        updateTabLabels();
+    }
+
+    function resetAllData() {
+        if (!confirm('Hapus semua data WD dan ulangi dari awal?')) return;
+        dataMaster = { COPY: [], BCA: [], BRIBNI: [], KECIL: [] };
+        currentActiveTab = 'COPY';
+        document.getElementById('tab-COPY').classList.add('active');
+        document.getElementById('tab-BCA').classList.remove('active');
+        document.getElementById('tab-BRIBNI').classList.remove('active');
+        document.getElementById('tab-KECIL').classList.remove('active');
+        document.getElementById('raw-paste').value = '';
+        localStorage.removeItem('wdToolData');
+        renderExcelTable();
+        updateTabLabels();
+    }
+
+    loadDataState();
+    renderExcelTable();
+    updateTabLabels();
+    updateCopyColumns();
 </script>
 
 </body>
