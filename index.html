@@ -3,293 +3,219 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard WD Manual</title>
+    <title>Google Sheets - WD Manual</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #ffffff;
-            margin: 20px;
-            color: #000;
-        }
-        .container {
-            max-width: 100%;
-            margin: 0 auto;
-        }
-        /* Bagian Atas / Header Pilihan Bank */
-        .bank-filters {
-            margin-bottom: 10px;
-            font-size: 14px;
-        }
-        .bank-filters a {
-            color: #0033cc;
-            text-decoration: none;
-            margin-right: 15px;
-            font-weight: bold;
-        }
-        .bank-filters .btn-uncheck {
-            background: #e1e1e1;
-            border: 1px solid #adadad;
-            padding: 2px 6px;
-            cursor: pointer;
-            font-size: 12px;
-            margin-right: 10px;
-        }
-
-        /* Styling Tabel ala Excel / Dashboard */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 13px;
-        }
-        th {
-            background-color: #ffffff;
-            color: #0033cc;
-            text-align: left;
-            padding: 8px;
-            font-weight: normal;
-            border-bottom: 1px solid #ccc;
-        }
-        th.sortable {
-            text-decoration: underline;
-            cursor: pointer;
-        }
-        td {
-            padding: 8px;
-            border-bottom: 1px solid #e0e0e0;
-            vertical-align: top;
-        }
-        tr.row-even {
-            background-color: #f2f2f2;
-        }
-        tr.row-odd {
-            background-color: #ffffff;
-        }
-        tr.row-done {
-            background-color: #d4edda !important; /* Hijau ketika di-Accept/Done */
-        }
+        body { font-family: Arial, sans-serif; background-color: #ffffff; margin: 10px; font-size: 13px; color: #000; }
         
-        /* Link & Teks Khusus */
-        .user-link {
-            color: #0033cc;
-            text-decoration: underline;
-            font-weight: bold;
-            display: block;
-        }
-        .sub-text {
-            color: #555;
-            font-size: 11px;
-            display: block;
-        }
-        .amount-text {
-            color: #cc0000;
-            font-weight: bold;
-        }
-        .currency-symbol {
-            background: #aaa;
-            color: #fff;
-            border-radius: 50%;
-            padding: 0 3px;
-            font-size: 10px;
-            margin-left: 5px;
-            display: inline-block;
-        }
+        /* Layout Grid Atas Eksklusif Excel */
+        .excel-header-grid { display: flex; width: 100%; border: 1px solid #ccc; margin-bottom: 5px; }
+        .cell-seabank { flex: 3; background-color: #00ffff; color: #000; font-weight: bold; font-size: 22px; text-align: center; padding: 15px 0; border-right: 2px solid #000; letter-spacing: 2px; }
+        .cell-proses-btn { flex: 1; background-color: #ff0000; color: #000; font-weight: bold; font-size: 16px; text-align: center; padding: 18px 0; cursor: pointer; border-right: 2px solid #000; border-bottom: 2px solid #000; text-transform: uppercase; }
+        .cell-proses-btn:hover { background-color: #cc0000; }
+        .cell-nominal-wd { flex: 1; background-color: #00ffff; font-weight: bold; font-size: 16px; text-align: center; padding: 18px 0; border-right: 1px solid #ccc; }
+        .cell-nominal-tf { flex: 1; background-color: #00ff00; font-weight: bold; font-size: 14px; text-align: center; padding: 18px 0; }
 
-        /* Panel Tombol Aksi di Bawah Tabel */
-        .action-panel {
-            background-color: #dbdbdb;
-            padding: 10px;
-            text-align: center;
-            margin-top: -1px;
-            border: 1px solid #ccc;
-        }
-        .btn-action {
-            padding: 6px 24px;
-            font-size: 13px;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            margin: 0 5px;
-            font-weight: bold;
-        }
-        .btn-accept {
-            background-color: #4cae4c;
-        }
-        .btn-accept:hover {
-            background-color: #449d44;
-        }
-        .btn-reject {
-            background-color: #d9534f;
-        }
-        .btn-reject:hover {
-            background-color: #c9302c;
-        }
+        /* Tab Bawah Excel Style */
+        .excel-tabs { display: flex; background-color: #f3f3f3; border: 1px solid #ccc; border-bottom: none; }
+        .excel-tab { padding: 8px 15px; cursor: pointer; border-right: 1px solid #ccc; background: #e4e4e4; font-weight: bold; color: #555; font-size: 12px; }
+        .excel-tab.active { background: #fff; color: #0055ff; border-top: 3px solid #0055ff; margin-top: -3px; border-bottom: 1px solid #fff; }
 
-        /* Kotak Input untuk Admin Pasang Data Mentah */
-        .admin-box {
-            margin-top: 30px;
-            padding: 15px;
-            border: 1px dashed #aaa;
-            background-color: #fafafa;
-        }
-        .admin-box textarea {
-            width: 100%;
-            height: 80px;
-            margin-top: 5px;
-        }
-        .btn-proses {
-            margin-top: 5px;
-            padding: 5px 15px;
-            background-color: #0033cc;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
+        /* Tabel Utama ala Kotak-Kotak Excel */
+        .excel-table-container { border: 1px solid #ccc; overflow-x: auto; background: #fff; }
+        table { width: 100%; border-collapse: collapse; }
+        
+        /* Baris Judul Kolom (Kuning) */
+        th { background-color: #ffff00; color: #000; font-weight: bold; border: 1px solid #000; text-align: center; padding: 6px; font-size: 13px; }
+        
+        /* Baris Tanggal (Hijau) */
+        .row-date-header td { background-color: #00ff00; color: #000; text-align: center; font-weight: bold; font-size: 11px; padding: 3px; border: 1px solid #000; letter-spacing: 2px; }
+        
+        td { border: 1px solid #ccc; padding: 6px; vertical-align: middle; height: 25px; }
+        
+        /* Kolom Khusus Alignment */
+        .col-center { text-align: center; }
+        .col-right { text-align: right; }
+        
+        /* Pewarnaan Data Awal (Pink Lembut ala Excel Anda) */
+        .row-data-wd { background-color: #fce4d6; }
+        .row-done { background-color: #d4edda !important; color: #155724; } /* Berubah hijau kalau DONE */
+        
+        .user-link { color: #0033cc; text-decoration: underline; font-weight: bold; display: block; }
+        .amount-text { color: #ff0000; font-weight: bold; }
+        
+        /* Input Data Mentah Box */
+        .input-area-box { margin-top: 20px; border: 1px dashed #777; padding: 10px; background: #fafafa; }
+        .input-area-box textarea { width: 100%; height: 60px; box-sizing: border-box; font-family: monospace; font-size: 12px; }
+
+        .btn-done-trigger { background: #fff; border: 1px solid #aaa; padding: 2px 8px; cursor: pointer; font-size: 11px; font-weight: bold; border-radius: 3px; }
+        .btn-done-trigger:hover { background: #e1e1e1; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <!-- Menu Atas Bank -->
-    <div class="bank-filters">
-        <button class="btn-uncheck" onclick="toggleAllCheckboxes(false)">Un/check All</button>
-        <input type="checkbox" id="chk-bri" checked> <a href="#" onclick="filterBank('BRI')">BRI [<span id="count-bri">0</span>]</a>
-        <input type="checkbox" id="chk-dana" checked> <a href="#" onclick="filterBank('DANA')">DANA [<span id="count-dana">0</span>]</a>
+<div style="max-width: 100%; margin: 0 auto;">
+
+    <!-- 1. BLOCK PANEL UTAMA ATAS (Eksklusif Excel Look) -->
+    <div class="excel-header-grid">
+        <div class="cell-seabank">SEABANK</div>
+        <div class="cell-proses-btn" onclick="prosesDataExcel()">PROSES DATA WD</div>
+        <div class="cell-nominal-wd">-2,500</div>
+        <div class="cell-nominal-tf">Nominal WD<br>Nominal TF</div>
     </div>
 
-    <!-- Tabel Data -->
-    <table id="wd-table">
-        <thead>
-            <tr>
-                <th style="width: 40px;">No <input type="checkbox" id="select-all-rows" onclick="selectAllRows(this)"></th>
-                <th class="sortable">User</th>
-                <th class="sortable">Date</th>
-                <th class="sortable">Amount</th>
-                <th class="sortable">Balance</th>
-                <th>Bank Asal</th>
-            </tr>
-        </thead>
-        <tbody id="table-body">
-            <!-- Data Masuk Di Sini -->
-        </tbody>
-    </table>
-
-    <!-- Tombol Aksi di Bawah ala Dashboard -->
-    <div class="action-panel">
-        <button class="btn-action btn-accept" onclick="processSelected('DONE')">Accept</button>
-        <button class="btn-action btn-reject" onclick="processSelected('REJECT')">Reject</button>
+    <!-- 2. TAB MENU BAWAH EXCEL -->
+    <div class="excel-tabs">
+        <div class="excel-tab active" id="tab-COPY" onclick="gantiTab('COPY')">BUAT COPY</div>
+        <div class="excel-tab" id="tab-BCA" onclick="gantiTab('BCA')">BCA</div>
+        <div class="excel-tab" id="tab-BRIBNI" onclick="gantiTab('BRIBNI')">BRI & BNI</div>
+        <div class="excel-tab" id="tab-KECIL" onclick="gantiTab('KECIL')">MANDIRI & BANK KECIL</div>
     </div>
 
-    <!-- Kotak Tersembunyi/Bawah untuk Anda input data mentah -->
-    <div class="admin-box">
-        <strong>Panel Input Data Mentah (Admin):</strong><br>
-        <textarea id="raw-input" placeholder="Paste data tabel dari web dashboard WD Anda di sini..."></textarea><br>
-        <button class="btn-proses" onclick="importRawData()">PROSES DATA</button>
+    <!-- 3. TABEL KOTAK EXCEL -->
+    <div class="excel-table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 50px;">NO</th>
+                    <th style="width: 120px;">ID</th>
+                    <th style="width: 160px;">TGL</th>
+                    <th style="width: 120px;">NOMINAL</th>
+                    <th>NAMA REKENING</th>
+                    <th style="width: 120px;">KETERANGAN</th>
+                </tr>
+                <tr class="row-date-header">
+                    <td colspan="6">TANGGAL</td>
+                </tr>
+            </thead>
+            <tbody id="excel-rows">
+                <!-- Baris kosong default ala excel -->
+                <script>
+                    for(let i=1; i<=15; i++) {
+                        document.write(`<tr><td class="col-center" style="color:#999;">${i}</td><td></td><td></td><td></td><td></td><td></td></tr>`);
+                    }
+                </script>
+            </tbody>
+        </table>
     </div>
+
+    <!-- 4. BOX ADMIN INPUT DATA MENTAH DARI WEB -->
+    <div class="input-area-box">
+        <strong>Tempel / Paste Form Data Mentah Web Dashboard di Sini:</strong>
+        <textarea id="raw-paste" placeholder="Paste data tabel WD di sini lalu klik tombol merah PROSES DATA WD di atas..."></textarea>
+    </div>
+
 </div>
 
 <script>
-    let databaseWD = [];
+    let currentActiveTab = 'COPY';
+    let dataMaster = { COPY: [], BCA: [], BRIBNI: [], KECIL: [] };
 
-    function renderTable() {
-        const tbody = document.getElementById('table-body');
+    function renderExcelTable() {
+        const tbody = document.getElementById('excel-rows');
         tbody.innerHTML = '';
         
-        let briCount = 0;
-        let danaCount = 0;
+        let listData = dataMaster[currentActiveTab];
 
-        databaseWD.forEach((item, index) => {
-            // Hitung statistik di atas
-            if (item.bankName === 'BRI') briCount++;
-            if (item.bankName === 'DANA') danaCount++;
-
-            const rowClass = item.status === 'DONE' ? 'row-done' : (index % 2 === 0 ? 'row-even' : 'row-odd');
+        // Tampilkan data yang ada
+        listData.forEach((item, index) => {
+            const isDoneRow = item.keterangan.toUpperCase() === 'DONE';
+            const rowClass = isDoneRow ? 'row-done' : (currentActiveTab === 'COPY' ? 'row-data-wd' : '');
             
             const tr = document.createElement('tr');
             tr.className = rowClass;
+            
+            // Kolom Keterangan: Kalau di Tab Bank, tampilkan tombol "DONE" untuk worker klik
+            let kolomKet = item.keterangan;
+            if (currentActiveTab !== 'COPY' && !isDoneRow) {
+                kolomKet = `<button class="btn-done-trigger" onclick="setRowDone(${index})">DONE</button>`;
+            }
+
             tr.innerHTML = `
-                <td>${index + 1} <input type="checkbox" class="row-check" data-id="${item.id}"></td>
-                <td>
-                    <a href="#" class="user-link">${item.username}</a>
-                    <span class="sub-text">Withdraw</span>
+                <td class="col-center">${index + 1}</td>
+                <td class="col-center">
+                    <span class="user-link">${item.idUser}</span>
+                    <span style="color:#0033cc; font-size:11px; text-decoration:underline;">Withdraw</span>
                 </td>
-                <td>${item.waktu}</td>
-                <td><span class="amount-text">${item.nominal}</span> <span class="currency-symbol">G</span></td>
-                <td>
-                    <span style="color:#0055aa; font-weight:bold;">${item.saldo}</span>
-                    <span class="sub-text" style="color:green; font-weight:bold;">G1</span>
-                </td>
-                <td>${item.rekeningTujuan}</td>
+                <td class="col-center">${item.tgl}</td>
+                <td class="col-center amount-text">${item.nominal}</td>
+                <td>${item.namaRekening}</td>
+                <td class="col-center">${kolomKet}</td>
             `;
             tbody.appendChild(tr);
         });
 
-        document.getElementById('count-bri').innerText = briCount;
-        document.getElementById('count-dana').innerText = danaCount;
+        // Tambahkan sisa baris kosong agar estetika grid Excel tetap terjaga
+        let sisaBaris = 15 - listData.length;
+        for (let i = 0; i < sisaBaris; i++) {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td class="col-center" style="color:#999;">${listData.length + i + 1}</td><td></td><td></td><td></td><td></td><td></td>`;
+            tbody.appendChild(tr);
+        }
     }
 
-    function importRawData() {
-        const rawText = document.getElementById('raw-input').value.trim();
-        if(!rawText) return;
+    function prosesDataExcel() {
+        const rawText = document.getElementById('raw-paste').value.trim();
+        if (!rawText) return alert("Tempel data form-nya dulu di kotak bawah, Bos!");
 
         const lines = rawText.split('\n');
         
         lines.forEach(line => {
-            const cols = line.split('\t');
-            if(cols.length >= 5) {
-                let username = cols[0] ? cols[0].replace('Withdraw', '').trim() : 'User';
-                let waktu = cols[1] || '';
-                let nominal = cols[2] || '0';
-                let saldo = cols[3] || '0';
-                let rekeningTujuan = cols[4] || '';
+            if (!line.trim()) return;
+            let parts = line.split('\t');
+            if (parts.length < 4) parts = line.split(/\s{2,}/);
 
-                let bankName = "LAINNYA";
-                if(rekeningTujuan.toUpperCase().includes("BRI")) bankName = "BRI";
-                if(rekeningTujuan.toUpperCase().includes("DANA")) bankName = "DANA";
+            let idUser = "", tgl = "", nominal = "", namaRekening = "";
+            let rekIdx = parts.findIndex(p => p.includes(","));
 
-                databaseWD.push({
-                    id: 'id_' + Math.random().toString(36).substr(2, 9),
-                    username: username,
-                    waktu: waktu,
-                    nominal: nominal,
-                    saldo: saldo,
-                    rekeningTujuan: rekeningTujuan,
-                    bankName: bankName,
-                    status: 'PENDING'
-                });
-            }
-        });
-
-        document.getElementById('raw-input').value = '';
-        renderTable();
-    }
-
-    function processSelected(actionType) {
-        const checkboxes = document.querySelectorAll('.row-check:checked');
-        checkboxes.forEach(cb => {
-            const id = cb.getAttribute('data-id');
-            const dataItem = databaseWD.find(item => item.id === id);
-            if(dataItem) {
-                if(actionType === 'DONE') {
-                    dataItem.status = 'DONE'; // Ubah jadi hijau
-                } else {
-                    // Jika reject, hapus atau beri tanda khusus
-                    databaseWD = databaseWD.filter(item => item.id !== id);
+            if (rekIdx !== -1 && rekIdx >= 4) {
+                namaRekening = parts[rekIdx].trim();
+                nominal = parts[rekIdx - 2] ? parts[rekIdx - 2].trim() : "";
+                tgl = parts[rekIdx - 3] ? parts[rekIdx - 3].trim() : "";
+                idUser = parts[1] ? parts[1].replace("Withdraw", "").trim() : "";
+            } else {
+                for (let i = 0; i < parts.length; i++) {
+                    if (parts[i].includes(",")) namaRekening = parts[i].trim();
+                    if (parts[i].includes("-") && parts[i].includes(":")) tgl = parts[i].trim();
                 }
+                idUser = parts[1] ? parts[1].replace("Withdraw", "").trim() : "";
+                nominal = parts[4] ? parts[4].trim() : "";
+            }
+
+            if (!idUser || !namaRekening) return;
+
+            // Auto-fix typo bank
+            let bank = namaRekening.split(",")[0].trim().toUpperCase();
+            if (bank === "EABANK") bank = "SEABANK";
+
+            let itemObj = { idUser, tgl, nominal, namaRekening, keterangan: "" };
+
+            // Pilah otomatis masuk ke list bank masing-masing di memori
+            if (["DANA", "OVO", "GOPAY", "LINKAJA"].includes(bank)) {
+                dataMaster.COPY.push(itemObj); // E-Wallet tetap di BUAT COPY sesuai sistem lama
+            } else if (bank === "BCA") {
+                dataMaster.BCA.push(itemObj);
+            } else if (bank === "BRI" || bank === "BNI") {
+                dataMaster.BRIBNI.push(itemObj);
+            } else {
+                dataMaster.KECIL.push(itemObj);
             }
         });
-        document.getElementById('select-all-rows').checked = false;
-        renderTable();
+
+        document.getElementById('raw-paste').value = '';
+        renderExcelTable();
+        alert("Data berhasil dipilah ke masing-masing Form Bank, Bos!");
     }
 
-    function selectAllRows(master) {
-        const checkboxes = document.querySelectorAll('.row-check');
-        checkboxes.forEach(cb => cb.checked = master.checked);
+    function setRowDone(index) {
+        dataMaster[currentActiveTab][index].keterangan = 'DONE';
+        renderExcelTable();
     }
 
-    function toggleAllCheckboxes(status) {
-        document.getElementById('chk-bri').checked = status;
-        document.getElementById('chk-dana').checked = status;
+    function gantiTab(tabName) {
+        currentActiveTab = tabName;
+        document.querySelectorAll('.excel-tab').forEach(t => t.classList.remove('active'));
+        document.getElementById('tab-' + tabName).classList.add('active');
+        renderExcelTable();
     }
 </script>
 
