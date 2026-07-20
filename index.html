@@ -30,7 +30,14 @@
         .main-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 12px; align-items: start; }
         .copy-output-panel { display: flex; flex-direction: column; gap: 10px; }
         .copy-output-box { border: 1px solid #ccc; background: #fafafa; padding: 10px; }
-        .copy-output-box strong { display: block; margin-bottom: 6px; font-size: 13px; }
+        
+        /* Pembungkus judul & tombol salin */
+        .copy-header-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+        .copy-output-box strong { font-size: 13px; }
+        
+        /* Tombol Salin Kecil Estetik */
+        .btn-salin-box { background: #0055ff; color: #fff; border: none; padding: 3px 8px; font-size: 11px; font-weight: bold; border-radius: 3px; cursor: pointer; }
+        .btn-salin-box:hover { background: #0044cc; }
         .copy-output-box textarea { width: 100%; height: 116px; box-sizing: border-box; resize: vertical; font-family: monospace; font-size: 12px; }
         
         table { width: 100%; border-collapse: collapse; table-layout: fixed; }
@@ -128,17 +135,28 @@
                 </tbody>
             </table>
         </div>
+        
+        <!-- BAGIAN OUTPUT PANEL DENGAN TOMBOL SALIN BARU -->
         <div class="copy-output-panel">
             <div class="copy-output-box">
-                <strong>Copy ID</strong>
+                <div class="copy-header-flex">
+                    <strong>Copy ID</strong>
+                    <button class="btn-salin-box" onclick="salinDataTextarea('copy-id')">Salin Data</button>
+                </div>
                 <textarea id="copy-id" readonly placeholder="ID akan tampil di sini..."></textarea>
             </div>
             <div class="copy-output-box">
-                <strong>Copy Nominal</strong>
+                <div class="copy-header-flex">
+                    <strong>Copy Nominal</strong>
+                    <button class="btn-salin-box" onclick="salinDataTextarea('copy-nominal')">Salin Data</button>
+                </div>
                 <textarea id="copy-nominal" readonly placeholder="Nominal akan tampil di sini..."></textarea>
             </div>
             <div class="copy-output-box">
-                <strong>Copy Nama Rekening</strong>
+                <div class="copy-header-flex">
+                    <strong>Copy Nama Rekening</strong>
+                    <button class="btn-salin-box" onclick="salinDataTextarea('copy-nama')">Salin Data</button>
+                </div>
                 <textarea id="copy-nama" readonly placeholder="Nama Rekening akan tampil di sini..."></textarea>
             </div>
         </div>
@@ -284,13 +302,20 @@
         return value.trim();
     }
 
+    /* FUNGSI SAKTI UNTUK SALIN DARI TEXTAREA TANPA POPUP ALERT */
+    function salinDataTextarea(elementId) {
+        const textarea = document.getElementById(elementId);
+        if (!textarea || !textarea.value.trim()) return;
+        copyTextToClipboard(textarea.value);
+    }
+
     function escapeHTML(text) {
         return text.replace(/[&<>"']/g, function(match) {
             return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'})[match];
         });
     }
 
-    function extractAccountNumber(text) {
+    fnction extractAccountNumber(text) {
         if (!text) return '';
         const match = text.match(/(\d{8,20})/g);
         return match ? match[0] : '';
@@ -316,7 +341,6 @@
         });
     }
 
-    // DISINI POPUP ALERT SUDAH DIHAPUS, SAKTI LANGSUNG COPY DIAM-DIAM
     function copyAccountNumber(index) {
         const item = dataMaster[currentActiveTab][index];
         if (!item) return;
@@ -430,7 +454,6 @@
         return 'KECIL';
     }
 
-    // DISINI REAL-TIME COUNTER DI TOMBOL TAB DIHITUNG OTOMATIS
     function updateTabLabels() {
         const tabsConfig = [
             { id: 'tab-COPY', name: 'BUAT COPY', key: 'COPY' },
