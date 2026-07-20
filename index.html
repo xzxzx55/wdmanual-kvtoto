@@ -43,7 +43,7 @@
         
         .col-center { text-align: center; }
         
-        /* Baris data awal (tanpa background/putih bersih seperti gambar baru) */
+        /* Baris data awal */
         .row-data-wd { background-color: #ffffff; }
         .row-done { background-color: #d4edda !important; color: #155724; }
         
@@ -316,13 +316,13 @@
         });
     }
 
+    // DISINI POPUP ALERT SUDAH DIHAPUS, SAKTI LANGSUNG COPY DIAM-DIAM
     function copyAccountNumber(index) {
         const item = dataMaster[currentActiveTab][index];
         if (!item) return;
         const account = extractAccountNumber(item.namaRekening);
-        if (!account) return alert('Nomor rekening tidak ditemukan.');
+        if (!account) return;
         copyTextToClipboard(account);
-        alert('Nomor rekening disalin: ' + account);
     }
 
     function normalizeId(value) {
@@ -421,7 +421,6 @@
         );
     }
 
-    // Dikembalikan ke penamaan asli tab Bos
     function getTabForBank(bankKey) {
         if (["DANA", "OVO", "GOPAY", "LINKAJA"].includes(bankKey)) return 'COPY';
         if (bankKey === 'BCA') return 'BCA';
@@ -431,14 +430,28 @@
         return 'KECIL';
     }
 
+    // DISINI REAL-TIME COUNTER DI TOMBOL TAB DIHITUNG OTOMATIS
     function updateTabLabels() {
-        // Label tab murni nama asli seperti skrip Bos
-        document.getElementById('tab-COPY').textContent = `BUAT COPY`;
-        document.getElementById('tab-BCA').textContent = `BCA`;
-        document.getElementById('tab-BRI').textContent = `BRI`;
-        document.getElementById('tab-BNI').textContent = `BNI`;
-        document.getElementById('tab-MANDIRI').textContent = `MANDIRI`;
-        document.getElementById('tab-KECIL').textContent = `BANK KECIL`;
+        const tabsConfig = [
+            { id: 'tab-COPY', name: 'BUAT COPY', key: 'COPY' },
+            { id: 'tab-BCA', name: 'BCA', key: 'BCA' },
+            { id: 'tab-BRI', name: 'BRI', key: 'BRI' },
+            { id: 'tab-BNI', name: 'BNI', key: 'BNI' },
+            { id: 'tab-MANDIRI', name: 'MANDIRI', key: 'MANDIRI' },
+            { id: 'tab-KECIL', name: 'BANK KECIL', key: 'KECIL' }
+        ];
+
+        tabsConfig.forEach(tab => {
+            const el = document.getElementById(tab.id);
+            if (el) {
+                const count = (dataMaster[tab.key] || []).length;
+                if (count > 0) {
+                    el.textContent = `${tab.name} (${count})`;
+                } else {
+                    el.textContent = tab.name;
+                }
+            }
+        });
     }
 
     function prosesDataExcel() {
@@ -469,6 +482,7 @@
         dataMaster[currentActiveTab][index].keterangan = 'DONE TRANSFER';
         saveDataState();
         renderExcelTable();
+        updateTabLabels();
     }
 
     function toggleRowSelection(index, isSelected) {
@@ -494,6 +508,7 @@
         selectedItems.forEach(item => item.keterangan = 'DONE TRANSFER');
         saveDataState();
         renderExcelTable();
+        updateTabLabels();
     }
 
     function removeRow(index) {
@@ -545,7 +560,6 @@
     updateTabLabels();
     updateCopyColumns();
     
-    // Aktifkan sinkronisasi otomatis ke server VPS tanpa merusak estetika atas
     hubungkanKeVPS();
 </script>
 
