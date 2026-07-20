@@ -49,6 +49,8 @@
         
         .user-link { color: #000000; text-decoration: underline; font-weight: bold; display: block; }
         .amount-text { color: #000000; font-weight: normal; }
+        .copy-account { cursor: pointer; text-decoration: underline; }
+        .copy-account:hover { color: #0055ff; }
         
         /* Input Area Box Modifikasi */
         .input-area-box { margin-top: 20px; border: 1px dashed #777; padding: 10px; background: #fafafa; }
@@ -64,8 +66,14 @@
 
 <div style="max-width: 100%; margin: 0 auto;">
 
+    <!-- BAR STATUS VPS REAL-TIME -->
+    <div style="background: #222; color: #fff; padding: 6px; font-size: 11px; font-family: monospace; display: flex; justify-content: space-between;">
+        <span>SERVER REAL-TIME SYNC: <span id="status-vps" style="color: yellow; font-weight: bold;">MENGHUBUNGKAN...</span></span>
+        <span style="color: #aaa;">Data disinkronkan via VPS</span>
+    </div>
+
     <!-- BLOCK PANEL UTAMA ATAS EKSKLUSIF EXCEL -->
-    <div class="excel-header-grid">
+    <div class="excel-header-grid" style="margin-top: 5px;">
         <div class="cell-seabank">
             <div class="header-wrap">
                 <img class="header-gif" src="https://photoin.io/images/2026/04/26/Logo-KVTOTO-Gif.gif" alt="KVTOTO kiri" />
@@ -84,10 +92,12 @@
 
     <!-- TAB MENU BAWAH EXCEL -->
     <div class="excel-tabs">
-        <div class="excel-tab active" id="tab-COPY" onclick="gantiTab('COPY')">BUAT COPY</div>
-        <div class="excel-tab" id="tab-BCA" onclick="gantiTab('BCA')">BCA</div>
-        <div class="excel-tab" id="tab-BRIBNI" onclick="gantiTab('BRIBNI')">BRI & BNI</div>
-        <div class="excel-tab" id="tab-KECIL" onclick="gantiTab('KECIL')">MANDIRI & BANK KECIL</div>
+        <div class="excel-tab active" id="tab-COPY" onclick="gantiTab('COPY')">EWALLET (0)</div>
+        <div class="excel-tab" id="tab-BCA" onclick="gantiTab('BCA')">BCA (0)</div>
+        <div class="excel-tab" id="tab-BRI" onclick="gantiTab('BRI')">BRI (0)</div>
+        <div class="excel-tab" id="tab-BNI" onclick="gantiTab('BNI')">BNI (0)</div>
+        <div class="excel-tab" id="tab-MANDIRI" onclick="gantiTab('MANDIRI')">MANDIRI (0)</div>
+        <div class="excel-tab" id="tab-KECIL" onclick="gantiTab('KECIL')">BANK KECIL (0)</div>
     </div>
 
     <!-- TABEL UTAMA SANGAT RAPI -->
@@ -120,12 +130,7 @@
                     </tr>
                 </thead>
                 <tbody id="excel-rows">
-                    <!-- Baris kosong default -->
-                    <script>
-                        for(let i=1; i<=15; i++) {
-                            document.write(`<tr><td class="col-center" style="color:#999;">${i}</td><td></td><td></td><td></td><td></td><td></td></tr>`);
-                        }
-                    </script>
+                    <!-- Baris kosong default awal -->
                 </tbody>
             </table>
         </div>
@@ -158,12 +163,53 @@
 </div>
 
 <script>
+    // IP Public VPS terpasang langsung di sini
+    const IP_VPS = "103.174.114.212"; 
+    let socket;
+
     let currentActiveTab = 'COPY';
-    let dataMaster = { COPY: [], BCA: [], BRIBNI: [], KECIL: [] };
+    let dataMaster = { COPY: [], BCA: [], BRI: [], BNI: [], MANDIRI: [], KECIL: [] };
+
+    // --- LOGIKA KONEKSI SINKRONISASI VPS ---
+    function hubungkanKeVPS() {
+        socket = new WebSocket(`ws://${IP_VPS}:8080`);
+
+        socket.onopen = () => {
+            document.getElementById('status-vps').innerText = "ONLINE (REAL-TIME AKTIF)";
+            document.getElementById('status-vps').style.color = "#00ff00";
+        };
+
+        socket.onmessage = (event) => {
+            try {
+                const res = JSON.parse(event.data);
+                if (res.type === 'UPDATE_DATA') {
+                    dataMaster = res.data;
+                    localStorage.setItem('wdToolData', JSON.stringify({ currentActiveTab, dataMaster }));
+                    renderExcelTable();
+                    updateTabLabels();
+                }
+            } catch (e) {
+                console.error("Gagal menerima sinkronisasi data:", e);
+            }
+        };
+
+        socket.onclose = () => {
+            document.getElementById('status-vps').innerText = "OFFLINE (MENCOBA RECONNECT...)";
+            document.getElementById('status-vps').style.color = "red";
+            setTimeout(hubungkanKeVPS, 3000);
+        };
+    }
+
+    function kirimPerubahanKeVPS() {
+        if (socket && socket.readyState === WebSocket.OPEN) {
+            socket.send(JSON.stringify({ type: 'SYNC_DATA', data: dataMaster }));
+        }
+    }
 
     function saveDataState() {
         const state = { currentActiveTab, dataMaster };
         localStorage.setItem('wdToolData', JSON.stringify(state));
+        kirimPerubahanKeVPS(); 
     }
 
     function loadDataState() {
@@ -184,7 +230,7 @@
         const tbody = document.getElementById('excel-rows');
         tbody.innerHTML = '';
         
-        let listData = dataMaster[currentActiveTab];
+        let listData = dataMaster[currentActiveTab] || [];
 
         listData.forEach((item, index) => {
             const isDoneRow = item.keterangan.toUpperCase() === 'DONE TRANSFER';
@@ -195,24 +241,26 @@
             
             const kolomKet = isDoneRow ? item.keterangan : `<button class="btn-done-trigger" onclick="setRowDone(${index})">DONE TRANSFER</button>`;
             const rejectButton = `<button class="btn-reject-trigger" onclick="removeRow(${index})">REJECT</button>`;
+            const accountNumber = extractAccountNumber(item.namaRekening);
+            const namaRekeningCell = accountNumber
+                ? `<td class="copy-account" title="Klik untuk salin nomor rekening" onclick="copyAccountNumber(${index})">${escapeHTML(item.namaRekening)}</td>`
+                : `<td style="padding-left:15px;">${escapeHTML(item.namaRekening)}</td>`;
 
             tr.innerHTML = `
                 <td class="col-center"><input type="checkbox" class="select-checkbox" ${item.selected ? 'checked' : ''} onclick="toggleRowSelection(${index}, this.checked)" /></td>
                 <td class="col-center" style="font-weight:bold;">${index + 1}</td>
                 <td class="col-center">
                     <span class="user-link">${item.idUser}</span>
-                    <span style="color:#0033cc; font-size:11px; text-decoration:underline;">Withdraw</span>
                 </td>
                 <td class="col-center">${item.tgl}</td>
                 <td class="col-center amount-text" style="font-weight:bold;">${item.nominal}</td>
-                <td style="padding-left:15px;">${item.namaRekening}</td>
+                ${namaRekeningCell}
                 <td class="col-center">${kolomKet}</td>
                 <td class="col-center">${rejectButton}</td>
             `;
             tbody.appendChild(tr);
         });
 
-        // Sisa baris kosong pembantu estetika spreadsheet
         let sisaBaris = 15 - listData.length;
         for (let i = 0; i < sisaBaris; i++) {
             const tr = document.createElement('tr');
@@ -243,12 +291,53 @@
         return value.trim();
     }
 
+    function escapeHTML(text) {
+        return text.replace(/[&<>"']/g, function(match) {
+            return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'})[match];
+        });
+    }
+
+    function extractAccountNumber(text) {
+        if (!text) return '';
+        const match = text.match(/(\d{8,20})/g);
+        return match ? match[0] : '';
+    }
+
+    function copyTextToClipboard(text) {
+        if (!navigator.clipboard) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            return;
+        }
+        navigator.clipboard.writeText(text).catch(() => {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+        });
+    }
+
+    function copyAccountNumber(index) {
+        const item = dataMaster[currentActiveTab][index];
+        if (!item) return;
+        const account = extractAccountNumber(item.namaRekening);
+        if (!account) return alert('Nomor rekening tidak ditemukan.');
+        copyTextToClipboard(account);
+        alert('Nomor rekening disalin: ' + account);
+    }
+
     function normalizeId(value) {
         return value ? value.replace(/"/g, '').trim() : '';
     }
 
     function updateCopyColumns() {
-        const listData = dataMaster[currentActiveTab].filter(item => item.keterangan.toUpperCase() === 'DONE TRANSFER');
+        const listData = (dataMaster[currentActiveTab] || []).filter(item => item.keterangan.toUpperCase() === 'DONE TRANSFER');
         document.getElementById('copy-id').value = listData.map(item => normalizeId(item.idUser)).join('\n');
         document.getElementById('copy-nominal').value = listData.map(item => formatCopyNominal(item.nominal)).join('\n');
         document.getElementById('copy-nama').value = listData.map(item => extractOwnerName(item.namaRekening)).join('\n');
@@ -317,43 +406,20 @@
         if (text.includes('BNI')) return 'BNI';
         if (text.includes('MANDIRI')) return 'MANDIRI';
 
-        // Bank kecil list
-        if (text.includes('DANAMON')) return 'KECIL';
-        if (text.includes('CIMB')) return 'KECIL';
-        if (text.includes('PERMATA')) return 'KECIL';
-        if (text.includes('PANIN')) return 'KECIL';
-        if (text.includes('MAYBANK')) return 'KECIL';
-        if (text.includes('OCBC') || text.includes('NISP')) return 'KECIL';
-        if (text.includes('MEGA')) return 'KECIL';
-        if (text.includes('BTN')) return 'KECIL';
-        if (text.includes('SINARMAS')) return 'KECIL';
-        if (text.includes('KB') || text.includes('BUKOPIN')) return 'KECIL';
-        if (text.includes('ARTHA')) return 'KECIL';
-        if (text.includes('BUMI')) return 'KECIL';
-        if (text.includes('MASPION')) return 'KECIL';
-        if (text.includes('MESTIKA')) return 'KECIL';
-        if (text.includes('GANESHA')) return 'KECIL';
-        if (text.includes('INA PERDANA') || text.includes('INA')) return 'KECIL';
-        if (text.includes('VICTORIA')) return 'KECIL';
-        if (text.includes('JAGO')) return 'KECIL';
-        if (text.includes('ALLO')) return 'KECIL';
-        if (text.includes('NEO') || text.includes('BNC')) return 'KECIL';
-        if (text.includes('BLU')) return 'KECIL';
-        if (text.includes('SEABANK')) return 'KECIL';
-        if (text.includes('KROM')) return 'KECIL';
-        if (text.includes('SUPERBANK')) return 'KECIL';
-        if (text.includes('BJB')) return 'KECIL';
-        if (text.includes('DKI')) return 'KECIL';
-        if (text.includes('JATIM')) return 'KECIL';
-        if (text.includes('JATENG')) return 'KECIL';
-        if (text.includes('SUMUT')) return 'KECIL';
-        if (text.includes('SULSELBAR')) return 'KECIL';
-        if (text.includes('BPD')) return 'KECIL';
+        if (text.includes('DANAMON') || text.includes('CIMB') || text.includes('PERMATA') || text.includes('PANIN') ||
+            text.includes('MAYBANK') || text.includes('OCBC') || text.includes('NISP') || text.includes('MEGA') ||
+            text.includes('BTN') || text.includes('SINARMAS') || text.includes('KB') || text.includes('BUKOPIN') ||
+            text.includes('ARTHA') || text.includes('BUMI') || text.includes('MASPION') || text.includes('MESTIKA') ||
+            text.includes('GANESHA') || text.includes('INA PERDANA') || text.includes('INA') || text.includes('VICTORIA') ||
+            text.includes('JAGO') || text.includes('ALLO') || text.includes('NEO') || text.includes('BNC') ||
+            text.includes('BLU') || text.includes('SEABANK') || text.includes('KROM') || text.includes('SUPERBANK') ||
+            text.includes('BJB') || text.includes('DKI') || text.includes('JATIM') || text.includes('JATENG') ||
+            text.includes('SUMUT') || text.includes('SULSELBAR') || text.includes('BPD')) return 'KECIL';
         return '';
     }
 
     function isDuplicateItem(item) {
-        const allItems = [...dataMaster.COPY, ...dataMaster.BCA, ...dataMaster.BRIBNI, ...dataMaster.KECIL];
+        const allItems = [...dataMaster.COPY, ...dataMaster.BCA, ...dataMaster.BRI, ...dataMaster.BNI, ...dataMaster.MANDIRI, ...dataMaster.KECIL];
         return allItems.some(existing =>
             existing.idUser === item.idUser &&
             existing.tgl === item.tgl &&
@@ -365,15 +431,19 @@
     function getTabForBank(bankKey) {
         if (["DANA", "OVO", "GOPAY", "LINKAJA"].includes(bankKey)) return 'COPY';
         if (bankKey === 'BCA') return 'BCA';
-        if (bankKey === 'BRI' || bankKey === 'BNI') return 'BRIBNI';
+        if (bankKey === 'BRI') return 'BRI';
+        if (bankKey === 'BNI') return 'BNI';
+        if (bankKey === 'MANDIRI') return 'MANDIRI';
         return 'KECIL';
     }
 
     function updateTabLabels() {
         document.getElementById('tab-COPY').textContent = `EWALLET (${dataMaster.COPY.length})`;
         document.getElementById('tab-BCA').textContent = `BCA (${dataMaster.BCA.length})`;
-        document.getElementById('tab-BRIBNI').textContent = `BRI & BNI (${dataMaster.BRIBNI.length})`;
-        document.getElementById('tab-KECIL').textContent = `MANDIRI & BANK KECIL (${dataMaster.KECIL.length})`;
+        document.getElementById('tab-BRI').textContent = `BRI (${dataMaster.BRI.length})`;
+        document.getElementById('tab-BNI').textContent = `BNI (${dataMaster.BNI.length})`;
+        document.getElementById('tab-MANDIRI').textContent = `MANDIRI (${dataMaster.MANDIRI.length})`;
+        document.getElementById('tab-KECIL').textContent = `BANK KECIL (${dataMaster.KECIL.length})`;
     }
 
     function prosesDataExcel() {
@@ -464,14 +534,13 @@
 
     function resetAllData() {
         if (!confirm('Hapus semua data WD dan ulangi dari awal?')) return;
-        dataMaster = { COPY: [], BCA: [], BRIBNI: [], KECIL: [] };
+        dataMaster = { COPY: [], BCA: [], BRI: [], BNI: [], MANDIRI: [], KECIL: [] };
         currentActiveTab = 'COPY';
+        document.querySelectorAll('.excel-tab').forEach(t => t.classList.remove('active'));
         document.getElementById('tab-COPY').classList.add('active');
-        document.getElementById('tab-BCA').classList.remove('active');
-        document.getElementById('tab-BRIBNI').classList.remove('active');
-        document.getElementById('tab-KECIL').classList.remove('active');
         document.getElementById('raw-paste').value = '';
         localStorage.removeItem('wdToolData');
+        saveDataState();
         renderExcelTable();
         updateTabLabels();
     }
@@ -480,6 +549,9 @@
     renderExcelTable();
     updateTabLabels();
     updateCopyColumns();
+    
+    // Aktifkan sinkronisasi otomatis ke server VPS
+    hubungkanKeVPS();
 </script>
 
 </body>
