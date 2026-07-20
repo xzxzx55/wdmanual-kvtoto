@@ -7,6 +7,30 @@
     <style>
         body { font-family: Arial, sans-serif; background-color: #ffffff; margin: 10px; font-size: 13px; color: #000; }
         
+        /* Gaya Tampilan Kotak Login */
+        .login-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: #f4f6f9; display: flex; justify-content: center; align-items: center; z-index: 9999;
+        }
+        .login-box {
+            background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            text-align: center; width: 320px; border: 2px solid #00cccb;
+        }
+        .login-box h2 { margin-bottom: 15px; font-size: 18px; color: #333; letter-spacing: 1px; }
+        .login-box input[type="password"] {
+            width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc;
+            border-radius: 4px; box-sizing: border-box; font-size: 14px; text-align: center;
+        }
+        .login-box button {
+            width: 100%; padding: 10px; border: none; background: #0055ff; color: #fff;
+            font-size: 14px; font-weight: bold; border-radius: 4px; cursor: pointer;
+        }
+        .login-box button:hover { background: #0044cc; }
+        .login-error { color: red; font-size: 12px; margin-top: 10px; display: none; }
+
+        /* Sembunyikan konten utama secara default */
+        #main-content { display: none; }
+
         /* Header Blok Atas Excel */
         .excel-header-grid { display: flex; width: 100%; border: 1px solid #00cccb; margin-bottom: 5px; }
         .cell-seabank { flex: 3.5; background-color: #00ffff; color: #000; font-weight: bold; font-size: 22px; padding: 10px 0; border-right: 1px solid #000; letter-spacing: 2px; display: flex; align-items: center; justify-content: center; }
@@ -30,7 +54,12 @@
         .main-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 12px; align-items: start; }
         .copy-output-panel { display: flex; flex-direction: column; gap: 10px; }
         .copy-output-box { border: 1px solid #ccc; background: #fafafa; padding: 10px; }
-        .copy-output-box strong { display: block; margin-bottom: 6px; font-size: 13px; }
+        
+        .copy-header-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+        .copy-output-box strong { font-size: 13px; }
+        
+        .btn-salin-box { background: #0055ff; color: #fff; border: none; padding: 3px 8px; font-size: 11px; font-weight: bold; border-radius: 3px; cursor: pointer; }
+        .btn-salin-box:hover { background: #0044cc; }
         .copy-output-box textarea { width: 100%; height: 116px; box-sizing: border-box; resize: vertical; font-family: monospace; font-size: 12px; }
         
         table { width: 100%; border-collapse: collapse; table-layout: fixed; }
@@ -64,7 +93,18 @@
 </head>
 <body>
 
-<div style="max-width: 100%; margin: 0 auto;">
+<!-- BLOK LAYAR LOGIN FORM -->
+<div id="login-screen" class="login-screen">
+    <div class="login-box">
+        <h2>🔒 MASUKKAN PASSWORD</h2>
+        <input type="password" id="pass-input" placeholder="Password Sistem" onkeydown="if(event.key === 'Enter') cekSistemLogin()" />
+        <button onclick="cekSistemLogin()">MASUK SISTEM</button>
+        <div id="login-error" class="login-error">Password Salah, Bos! Coba lagi.</div>
+    </div>
+</div>
+
+<!-- KONTEN APLIKASI UTAMA (DIPROTEKSI) -->
+<div id="main-content" style="max-width: 100%; margin: 0 auto;">
 
     <!-- BLOCK PANEL UTAMA ATAS EKSKLUSIF EXCEL -->
     <div class="excel-header-grid">
@@ -81,6 +121,7 @@
         <button onclick="deleteSelectedRows()" style="padding:8px 12px; border:none; background:#d9534f; color:#fff; cursor:pointer; border-radius:4px;">HAPUS CENTANG TERPILIH</button>
         <button onclick="markSelectedDone()" style="padding:8px 12px; border:none; background:#5cb85c; color:#fff; cursor:pointer; border-radius:4px;">DONE TERPILIH</button>
         <button onclick="resetAllData()" style="padding:8px 12px; border:none; background:#777; color:#fff; cursor:pointer; border-radius:4px;">RESET ALL DATA</button>
+        <button onclick="keluarSistem()" style="padding:8px 12px; border:none; background:#333; color:#fff; cursor:pointer; border-radius:4px; margin-left:auto;">LOGOUT</button>
         <span style="align-self:center; font-size:12px; color:#333;">Data disimpan otomatis. Server Sync: <span id="status-vps" style="color: red; font-weight: bold;">MENGHUBUNGKAN...</span></span>
     </div>
 
@@ -128,17 +169,27 @@
                 </tbody>
             </table>
         </div>
+        
         <div class="copy-output-panel">
             <div class="copy-output-box">
-                <strong>Copy ID</strong>
+                <div class="copy-header-flex">
+                    <strong>Copy ID</strong>
+                    <button class="btn-salin-box" onclick="salinDataTextarea('copy-id')">Salin Data</button>
+                </div>
                 <textarea id="copy-id" readonly placeholder="ID akan tampil di sini..."></textarea>
             </div>
             <div class="copy-output-box">
-                <strong>Copy Nominal</strong>
+                <div class="copy-header-flex">
+                    <strong>Copy Nominal</strong>
+                    <button class="btn-salin-box" onclick="salinDataTextarea('copy-nominal')">Salin Data</button>
+                </div>
                 <textarea id="copy-nominal" readonly placeholder="Nominal akan tampil di sini..."></textarea>
             </div>
             <div class="copy-output-box">
-                <strong>Copy Nama Rekening</strong>
+                <div class="copy-header-flex">
+                    <strong>Copy Nama Rekening</strong>
+                    <button class="btn-salin-box" onclick="salinDataTextarea('copy-nama')">Salin Data</button>
+                </div>
                 <textarea id="copy-nama" readonly placeholder="Nama Rekening akan tampil di sini..."></textarea>
             </div>
         </div>
@@ -157,14 +208,51 @@
 </div>
 
 <script>
+    // --- KONFIGURASI KUNCI KESELAMATAN ---
+    const PASSWORD_AKSES = "admin123"; 
+
+    function validasiSesiLogin() {
+        const statusLogin = sessionStorage.getItem('isWdUserLoggedIn');
+        if (statusLogin === 'true') {
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('main-content').style.display = 'block';
+            hubungkanKeVPS(); 
+        }
+    }
+
+    function cekSistemLogin() {
+        const inputPass = document.getElementById('pass-input').value;
+        const errorEl = document.getElementById('login-error');
+        
+        if (inputPass === PASSWORD_AKSES) {
+            sessionStorage.setItem('isWdUserLoggedIn', 'true');
+            errorEl.style.display = 'none';
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('main-content').style.display = 'block';
+            hubungkanKeVPS();
+            renderExcelTable();
+            updateTabLabels();
+        } else {
+            errorEl.style.display = 'block';
+            document.getElementById('pass-input').value = '';
+            document.getElementById('pass-input').focus();
+        }
+    }
+
+    function keluarSistem() {
+        sessionStorage.removeItem('isWdUserLoggedIn');
+        window.location.reload();
+    }
+
     const IP_VPS = "103.174.114.212"; 
     let socket;
 
     let currentActiveTab = 'COPY';
     let dataMaster = { COPY: [], BCA: [], BRI: [], BNI: [], MANDIRI: [], KECIL: [] };
 
-    // --- REAL-TIME SINKRONISASI VPS ---
     function hubungkanKeVPS() {
+        if (sessionStorage.getItem('isWdUserLoggedIn') !== 'true') return;
+        
         socket = new WebSocket(`ws://${IP_VPS}:8080`);
 
         socket.onopen = () => {
@@ -221,6 +309,7 @@
 
     function renderExcelTable() {
         const tbody = document.getElementById('excel-rows');
+        if (!tbody) return;
         tbody.innerHTML = '';
         
         let listData = dataMaster[currentActiveTab] || [];
@@ -284,6 +373,12 @@
         return value.trim();
     }
 
+    function salinDataTextarea(elementId) {
+        const textarea = document.getElementById(elementId);
+        if (!textarea || !textarea.value.trim()) return;
+        copyTextToClipboard(textarea.value);
+    }
+
     function escapeHTML(text) {
         return text.replace(/[&<>"']/g, function(match) {
             return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'})[match];
@@ -316,7 +411,6 @@
         });
     }
 
-    // DISINI POPUP ALERT SUDAH DIHAPUS, SAKTI LANGSUNG COPY DIAM-DIAM
     function copyAccountNumber(index) {
         const item = dataMaster[currentActiveTab][index];
         if (!item) return;
@@ -331,9 +425,13 @@
 
     function updateCopyColumns() {
         const listData = (dataMaster[currentActiveTab] || []).filter(item => item.keterangan.toUpperCase() === 'DONE TRANSFER');
-        document.getElementById('copy-id').value = listData.map(item => normalizeId(item.idUser)).join('\n');
-        document.getElementById('copy-nominal').value = listData.map(item => formatCopyNominal(item.nominal)).join('\n');
-        document.getElementById('copy-nama').value = listData.map(item => extractOwnerName(item.namaRekening)).join('\n');
+        const idEl = document.getElementById('copy-id');
+        const nomEl = document.getElementById('copy-nominal');
+        const nameEl = document.getElementById('copy-nama');
+        
+        if (idEl) idEl.value = listData.map(item => normalizeId(item.idUser)).join('\n');
+        if (nomEl) nomEl.value = listData.map(item => formatCopyNominal(item.nominal)).join('\n');
+        if (nameEl) nameEl.value = listData.map(item => extractOwnerName(item.namaRekening)).join('\n');
     }
 
     function normalizeLine(text) {
@@ -430,8 +528,8 @@
         return 'KECIL';
     }
 
-    // DISINI REAL-TIME COUNTER DI TOMBOL TAB DIHITUNG OTOMATIS
     function updateTabLabels() {
+        if (sessionStorage.getItem('isWdUserLoggedIn') !== 'true') return;
         const tabsConfig = [
             { id: 'tab-COPY', name: 'BUAT COPY', key: 'COPY' },
             { id: 'tab-BCA', name: 'BCA', key: 'BCA' },
@@ -522,7 +620,8 @@
     function gantiTab(tabName) {
         currentActiveTab = tabName;
         document.querySelectorAll('.excel-tab').forEach(t => t.classList.remove('active'));
-        document.getElementById('tab-' + tabName).classList.add('active');
+        const tabEl = document.getElementById('tab-' + tabName);
+        if (tabEl) tabEl.classList.add('active');
         renderExcelTable();
         updateCopyColumns();
         saveDataState();
@@ -547,7 +646,8 @@
         dataMaster = { COPY: [], BCA: [], BRI: [], BNI: [], MANDIRI: [], KECIL: [] };
         currentActiveTab = 'COPY';
         document.querySelectorAll('.excel-tab').forEach(t => t.classList.remove('active'));
-        document.getElementById('tab-COPY').classList.add('active');
+        const tabEl = document.getElementById('tab-COPY');
+        if (tabEl) tabEl.classList.add('active');
         document.getElementById('raw-paste').value = '';
         localStorage.removeItem('wdToolData');
         saveDataState();
@@ -555,12 +655,16 @@
         updateTabLabels();
     }
 
+    // Eksekusi Awal
     loadDataState();
-    renderExcelTable();
-    updateTabLabels();
-    updateCopyColumns();
+    validasiSesiLogin();
     
-    hubungkanKeVPS();
+    // Pengecekan data cadangan jika sesi login aktif
+    if (sessionStorage.getItem('isWdUserLoggedIn') === 'true') {
+        renderExcelTable();
+        updateTabLabels();
+        updateCopyColumns();
+    }
 </script>
 
 </body>
