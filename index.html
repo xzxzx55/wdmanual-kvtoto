@@ -66,14 +66,8 @@
 
 <div style="max-width: 100%; margin: 0 auto;">
 
-    <!-- BAR STATUS VPS REAL-TIME -->
-    <div style="background: #222; color: #fff; padding: 6px; font-size: 11px; font-family: monospace; display: flex; justify-content: space-between;">
-        <span>SERVER REAL-TIME SYNC: <span id="status-vps" style="color: yellow; font-weight: bold;">MENGHUBUNGKAN...</span></span>
-        <span style="color: #aaa;">Data disinkronkan via VPS</span>
-    </div>
-
     <!-- BLOCK PANEL UTAMA ATAS EKSKLUSIF EXCEL -->
-    <div class="excel-header-grid" style="margin-top: 5px;">
+    <div class="excel-header-grid">
         <div class="cell-seabank">
             <div class="header-wrap">
                 <img class="header-gif" src="https://photoin.io/images/2026/04/26/Logo-KVTOTO-Gif.gif" alt="KVTOTO kiri" />
@@ -83,21 +77,21 @@
         </div>
     </div>
     <div style="margin-top:8px; display:flex; gap:8px; flex-wrap: wrap; align-items: center;">
-        <button onclick="resetAllData()" style="padding:8px 12px; border:none; background:#d9534f; color:#fff; cursor:pointer; border-radius:4px;">HAPUS MANUAL SEMUA</button>
         <button onclick="deleteDoneTransferRows()" style="padding:8px 12px; border:none; background:#f0ad4e; color:#000; cursor:pointer; border-radius:4px;">HAPUS DONE TRANSFER TAB INI</button>
         <button onclick="deleteSelectedRows()" style="padding:8px 12px; border:none; background:#d9534f; color:#fff; cursor:pointer; border-radius:4px;">HAPUS CENTANG TERPILIH</button>
         <button onclick="markSelectedDone()" style="padding:8px 12px; border:none; background:#5cb85c; color:#fff; cursor:pointer; border-radius:4px;">DONE TERPILIH</button>
-        <span style="align-self:center; font-size:12px; color:#333;">Data disimpan otomatis. Refresh tidak menghapus.</span>
+        <button onclick="resetAllData()" style="padding:8px 12px; border:none; background:#777; color:#fff; cursor:pointer; border-radius:4px;">RESET ALL DATA</button>
+        <span style="align-self:center; font-size:12px; color:#333;">Data disimpan otomatis. Server Sync: <span id="status-vps" style="color: red; font-weight: bold;">MENGHUBUNGKAN...</span></span>
     </div>
 
     <!-- TAB MENU BAWAH EXCEL -->
     <div class="excel-tabs">
-        <div class="excel-tab active" id="tab-COPY" onclick="gantiTab('COPY')">EWALLET (0)</div>
-        <div class="excel-tab" id="tab-BCA" onclick="gantiTab('BCA')">BCA (0)</div>
-        <div class="excel-tab" id="tab-BRI" onclick="gantiTab('BRI')">BRI (0)</div>
-        <div class="excel-tab" id="tab-BNI" onclick="gantiTab('BNI')">BNI (0)</div>
-        <div class="excel-tab" id="tab-MANDIRI" onclick="gantiTab('MANDIRI')">MANDIRI (0)</div>
-        <div class="excel-tab" id="tab-KECIL" onclick="gantiTab('KECIL')">BANK KECIL (0)</div>
+        <div class="excel-tab active" id="tab-COPY" onclick="gantiTab('COPY')">BUAT COPY</div>
+        <div class="excel-tab" id="tab-BCA" onclick="gantiTab('BCA')">BCA</div>
+        <div class="excel-tab" id="tab-BRI" onclick="gantiTab('BRI')">BRI</div>
+        <div class="excel-tab" id="tab-BNI" onclick="gantiTab('BNI')">BNI</div>
+        <div class="excel-tab" id="tab-MANDIRI" onclick="gantiTab('MANDIRI')">MANDIRI</div>
+        <div class="excel-tab" id="tab-KECIL" onclick="gantiTab('KECIL')">BANK KECIL</div>
     </div>
 
     <!-- TABEL UTAMA SANGAT RAPI -->
@@ -126,11 +120,11 @@
                         <th>ACTION</th>
                     </tr>
                     <tr class="row-date-header">
-                        <td colspan="7">TANGGAL</td>
+                        <td colspan="8">TANGGAL</td>
                     </tr>
                 </thead>
                 <tbody id="excel-rows">
-                    <!-- Baris kosong default awal -->
+                    <!-- Baris kosong default -->
                 </tbody>
             </table>
         </div>
@@ -163,20 +157,19 @@
 </div>
 
 <script>
-    // IP Public VPS terpasang langsung di sini
     const IP_VPS = "103.174.114.212"; 
     let socket;
 
     let currentActiveTab = 'COPY';
     let dataMaster = { COPY: [], BCA: [], BRI: [], BNI: [], MANDIRI: [], KECIL: [] };
 
-    // --- LOGIKA KONEKSI SINKRONISASI VPS ---
+    // --- REAL-TIME SINKRONISASI VPS ---
     function hubungkanKeVPS() {
         socket = new WebSocket(`ws://${IP_VPS}:8080`);
 
         socket.onopen = () => {
-            document.getElementById('status-vps').innerText = "ONLINE (REAL-TIME AKTIF)";
-            document.getElementById('status-vps').style.color = "#00ff00";
+            document.getElementById('status-vps').innerText = "ONLINE";
+            document.getElementById('status-vps').style.color = "#00bb00";
         };
 
         socket.onmessage = (event) => {
@@ -189,12 +182,12 @@
                     updateTabLabels();
                 }
             } catch (e) {
-                console.error("Gagal menerima sinkronisasi data:", e);
+                console.error("Gagal sinkronisasi data:", e);
             }
         };
 
         socket.onclose = () => {
-            document.getElementById('status-vps').innerText = "OFFLINE (MENCOBA RECONNECT...)";
+            document.getElementById('status-vps').innerText = "OFFLINE (RECONNECTING...)";
             document.getElementById('status-vps').style.color = "red";
             setTimeout(hubungkanKeVPS, 3000);
         };
@@ -209,7 +202,7 @@
     function saveDataState() {
         const state = { currentActiveTab, dataMaster };
         localStorage.setItem('wdToolData', JSON.stringify(state));
-        kirimPerubahanKeVPS(); 
+        kirimPerubahanKeVPS();
     }
 
     function loadDataState() {
@@ -264,7 +257,7 @@
         let sisaBaris = 15 - listData.length;
         for (let i = 0; i < sisaBaris; i++) {
             const tr = document.createElement('tr');
-            tr.innerHTML = `<td></td><td class="col-center" style="color:#999;">${listData.length + i + 1}</td><td></td><td></td><td></td><td></td><td></td><td></td>`;
+            tr.innerHTML = `<td class="col-center" style="color:#999;">${listData.length + i + 1}</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>`;
             tbody.appendChild(tr);
         }
 
@@ -428,6 +421,7 @@
         );
     }
 
+    // Dikembalikan ke penamaan asli tab Bos
     function getTabForBank(bankKey) {
         if (["DANA", "OVO", "GOPAY", "LINKAJA"].includes(bankKey)) return 'COPY';
         if (bankKey === 'BCA') return 'BCA';
@@ -438,12 +432,13 @@
     }
 
     function updateTabLabels() {
-        document.getElementById('tab-COPY').textContent = `EWALLET (${dataMaster.COPY.length})`;
-        document.getElementById('tab-BCA').textContent = `BCA (${dataMaster.BCA.length})`;
-        document.getElementById('tab-BRI').textContent = `BRI (${dataMaster.BRI.length})`;
-        document.getElementById('tab-BNI').textContent = `BNI (${dataMaster.BNI.length})`;
-        document.getElementById('tab-MANDIRI').textContent = `MANDIRI (${dataMaster.MANDIRI.length})`;
-        document.getElementById('tab-KECIL').textContent = `BANK KECIL (${dataMaster.KECIL.length})`;
+        // Label tab murni nama asli seperti skrip Bos
+        document.getElementById('tab-COPY').textContent = `BUAT COPY`;
+        document.getElementById('tab-BCA').textContent = `BCA`;
+        document.getElementById('tab-BRI').textContent = `BRI`;
+        document.getElementById('tab-BNI').textContent = `BNI`;
+        document.getElementById('tab-MANDIRI').textContent = `MANDIRI`;
+        document.getElementById('tab-KECIL').textContent = `BANK KECIL`;
     }
 
     function prosesDataExcel() {
@@ -550,7 +545,7 @@
     updateTabLabels();
     updateCopyColumns();
     
-    // Aktifkan sinkronisasi otomatis ke server VPS
+    // Aktifkan sinkronisasi otomatis ke server VPS tanpa merusak estetika atas
     hubungkanKeVPS();
 </script>
 
